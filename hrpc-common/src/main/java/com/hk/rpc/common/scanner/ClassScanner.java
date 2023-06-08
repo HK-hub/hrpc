@@ -50,24 +50,24 @@ public class ClassScanner {
     private static void findAndAddClassesInPackageByFile(String packageName, String packagePath, final boolean recursive, List<String> classNameList) {
 
         // 获取此包的目录，建立一个 file
-        File file = new File(packagePath);
+        File dir = new File(packagePath);
 
         // 不存在，不是目录直接返回
-        if (!file.exists() || !file.isDirectory()) {
+        if (!dir.exists() || !dir.isDirectory()) {
             return;
         }
 
         // 如果存在就获取包下的所有文件
-        File[] files = file.listFiles(pathname -> {
+        File[] fileDirs = dir.listFiles(file -> {
             // 自定义过滤规则：如果可以循环或者是 class 文件
             return (recursive && file.isDirectory()) || (file.getName().endsWith(".class"));
         });
 
         // 循环所有文件
-        for (File f : files) {
+        for (File file : fileDirs) {
             // 如果是目录则继续扫描
-            if (f.isDirectory()) {
-                findAndAddClassesInPackageByFile(packageName+ "." + f.getName(), file.getAbsolutePath(), recursive, classNameList);
+            if (file.isDirectory()) {
+                findAndAddClassesInPackageByFile(packageName + "." + file.getName(), file.getAbsolutePath(), recursive, classNameList);
             } else {
                 // 不是目录，去掉后面的.class 只留下类名
                 String className = file.getName().substring(0, file.getName().length() - 6);
@@ -142,7 +142,7 @@ public class ClassScanner {
         String packageDirName = packageName.replace('.', '/');
 
         // 定义一个枚举集合，并进行循环来处理目录下的东西
-        Enumeration<URL> dirs = Thread.currentThread().getContextClassLoader().getResources(packageName);
+        Enumeration<URL> dirs = Thread.currentThread().getContextClassLoader().getResources(packageDirName);
         while (dirs.hasMoreElements()) {
             // 获取下一个元素
             URL url = dirs.nextElement();

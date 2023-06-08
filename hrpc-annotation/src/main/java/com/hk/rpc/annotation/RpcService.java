@@ -1,5 +1,6 @@
 package com.hk.rpc.annotation;
 
+import lombok.ToString;
 import org.springframework.stereotype.Component;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
