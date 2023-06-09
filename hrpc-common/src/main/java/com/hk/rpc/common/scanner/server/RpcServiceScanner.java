@@ -66,7 +66,7 @@ public class RpcServiceScanner extends ClassScanner {
 
                 log.info("当前标注了@RpcService的类实例名称:{}",  clazz.getName());
                 log.info("@RpcService注解上标注的属性信息如下:");
-                log.info("serverName==>>>{}", serviceName);
+                log.info("serverName==>>>{}, key={}", serviceName, key);
 
                 // 放入 handlerMap 中
                 handlerMap.put(key, clazz.newInstance());

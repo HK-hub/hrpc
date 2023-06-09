@@ -67,7 +67,6 @@ public class BaseServer implements Server {
             // 非默认零值
             this.port = port;
         }
-
     }
 
 
