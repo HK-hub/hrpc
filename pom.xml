@@ -13,6 +13,8 @@
         <module>hrpc-common</module>
         <module>hrpc-test</module>
         <module>hrpc-provider</module>
+        <module>hrpc-constants</module>
+        <module>hrpc-protocol</module>
     </modules>
 
     <properties>
