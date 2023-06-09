@@ -4,6 +4,8 @@ import com.hk.rpc.annotation.RpcService;
 import com.hk.rpc.common.scanner.ClassScanner;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -36,7 +38,9 @@ public class RpcServiceScanner extends ClassScanner {
         }
 
         // 处理所有类筛选出服务提供者类
-        classNameList.forEach(RpcServiceScanner::filterClassAndBuildMetaData);
+        classNameList.forEach(className -> {
+            filterClassAndBuildMetaData(className, map);
+        });
 
         return map;
     }
@@ -46,41 +50,66 @@ public class RpcServiceScanner extends ClassScanner {
      * 筛选出RPC服务提供者并且获取元数据，注册服务到注册中心
      * @param className 全类名
      */
-    private static void filterClassAndBuildMetaData(String className) {
+    private static void filterClassAndBuildMetaData(String className, Map<String, Object> handlerMap) {
         try {
             Class<?> clazz = Class.forName(className);
             // 获取注解
             RpcService annotation = clazz.getAnnotation(RpcService.class);
             if (Objects.nonNull(annotation)) {
                 // 注解存在，进行元数据获取
-                // 首先使用 interfaceClass, interfaceClass为空，在使用interfaceClassName, 如果两个都没有，则通过获取interface接口来进行确定
-                String interfaceClass = annotation.interfaceClass().getName();
-                String interfaceClassName = annotation.interfaceClassName();
+                // TODO 后续向注册中心注册服务元数据，同时向handlerMap 中记录标注了RpcService 注解的类实例。
+                // handlerMap中的Key先简单存储为serviceName+version+group，后续根据实际情况处理key
+                String serviceName = getServiceName(annotation);
                 String version = annotation.version();
                 String group = annotation.group();
+                String key = serviceName.concat(version).concat(group);
 
-                // 如果 interfaceClass 和 interfaceClassName 都为空则进行获取实现的 interface 接口
-                Class<?>[] interfaces = clazz.getInterfaces();
-                if (interfaces.length == 1) {
-                    // 仅仅实现一个接口尝试...
-                    Class<?> parent = interfaces[0];
-                    interfaceClass = parent.getName();
-                    interfaceClassName = parent.getName();
-                }
-
-                // TODO 后续向注册中心注册服务元数据，同时向handlerMap 中记录标注了RpcService 注解的类实例。
                 log.info("当前标注了@RpcService的类实例名称:{}",  clazz.getName());
                 log.info("@RpcService注解上标注的属性信息如下:");
-                log.info("interfaceClass==>>>{}", interfaceClass);
-                log.info("interfaceClassName==>>>{}", interfaceClassName);
-                log.info("version==>>>{}", version);
-                log.info("group==>>>{}", group);
+                log.info("serverName==>>>{}", serviceName);
 
+                // 放入 handlerMap 中
+                handlerMap.put(key, clazz.newInstance());
             }
         } catch (Exception e) {
             log.error("scan rpc service classes throw exception:", e);
         }
     }
+
+
+    /**
+     * 获取serviceName
+     */
+    private static String getServiceName(RpcService rpcService){
+
+        // 首先使用 interfaceClass, interfaceClass为空，在使用interfaceClassName, 如果两个都没有，则通过获取interface接口来进行确定
+        // 优先使用 interfaceClass
+        Class<?> clazz = rpcService.interfaceClass();
+        if (clazz == void.class){
+            // 如果 interfaceClass 和 interfaceClassName 都为空则进行获取实现的 interface 接口
+            if (StringUtils.isNotEmpty(rpcService.interfaceClassName())) {
+                // 指定类名名称
+                return rpcService.interfaceClassName();
+            } else {
+                // 没有指定名称，采取默认实现的接口
+                Class<?>[] interfaces = clazz.getInterfaces();
+                if (interfaces.length == 1) {
+                    // 仅仅实现一个接口尝试...
+                    Class<?> parent = interfaces[0];
+                    return parent.getName();
+                }
+            }
+            return rpcService.interfaceClassName();
+        }
+
+        String serviceName = clazz.getName();
+        if (StringUtils.isEmpty(serviceName)){
+            serviceName = rpcService.interfaceClassName();
+        }
+
+        return serviceName;
+    }
+
 
 
 }

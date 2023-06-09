@@ -12,6 +12,7 @@
         <module>hrpc-annotation</module>
         <module>hrpc-common</module>
         <module>hrpc-test</module>
+        <module>hrpc-provider</module>
     </modules>
 
     <properties>

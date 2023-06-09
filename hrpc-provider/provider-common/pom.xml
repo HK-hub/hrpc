@@ -3,30 +3,17 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>hrpc</artifactId>
+        <artifactId>hrpc-provider</artifactId>
         <groupId>com.hk.rpc</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>hrpc-test</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>test-scanner</module>
-        <module>test-provider</module>
-    </modules>
+    <artifactId>provider-common</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
-
-    <dependencies>
-        <dependency>
-            <groupId>com.hk.rpc</groupId>
-            <artifactId>hrpc-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
 
 </project>
