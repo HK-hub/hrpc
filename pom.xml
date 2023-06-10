@@ -15,6 +15,8 @@
         <module>hrpc-provider</module>
         <module>hrpc-constants</module>
         <module>hrpc-protocol</module>
+        <module>hrpc-codec</module>
+        <module>hrpc-serialization</module>
     </modules>
 
     <properties>

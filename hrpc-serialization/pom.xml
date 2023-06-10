@@ -3,13 +3,19 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>hrpc-provider</artifactId>
+        <artifactId>hrpc</artifactId>
         <groupId>com.hk.rpc</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>provider-common</artifactId>
+    <artifactId>hrpc-serialization</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>serialization-api</module>
+        <module>serialization-jdk</module>
+    </modules>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -19,12 +25,7 @@
     <dependencies>
         <dependency>
             <groupId>com.hk.rpc</groupId>
-            <artifactId>hrpc-serialization</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.hk.rpc</groupId>
-            <artifactId>hrpc-codec</artifactId>
+            <artifactId>hrpc-common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
