@@ -17,6 +17,7 @@
         <module>hrpc-protocol</module>
         <module>hrpc-codec</module>
         <module>hrpc-serialization</module>
+        <module>hrpc-consumer</module>
     </modules>
 
     <properties>
