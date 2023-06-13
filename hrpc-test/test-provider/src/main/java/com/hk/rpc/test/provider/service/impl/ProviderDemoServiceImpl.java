@@ -1,7 +1,8 @@
 package com.hk.rpc.test.provider.service.impl;
 
 import com.hk.rpc.annotation.RpcService;
-import com.hk.rpc.test.provider.service.DemoService;
+import com.hk.rpc.test.api.DemoService;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author : HK意境
@@ -13,6 +14,14 @@ import com.hk.rpc.test.provider.service.DemoService;
  * @Modified :
  * @Version : 1.0
  */
-@RpcService(interfaceClass = DemoService.class, interfaceClassName = "com.hk.rpc.test.provider.service.DemoService", version = "1.0", group = "hk-hub")
-public class ProviderDemoServiceImpl implements DemoService{
+@Slf4j
+@RpcService(interfaceClass = DemoService.class, interfaceClassName = "com.hk.rpc.test.api.DemoService", version = "1.0.0", group = "hk-hub")
+public class ProviderDemoServiceImpl implements DemoService {
+
+
+    @Override
+    public String hello(String name) {
+        log.info("调用hello 方法传入参数为:{}", name);
+        return "hello hrpc!, I am " + name;
+    }
 }
