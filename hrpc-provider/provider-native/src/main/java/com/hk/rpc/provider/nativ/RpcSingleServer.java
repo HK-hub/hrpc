@@ -35,6 +35,16 @@ public class RpcSingleServer extends BaseServer {
         }
     }
 
+    public RpcSingleServer(String host, int port, String scanPackage, String reflectType) {
+        super(host, port, reflectType);
 
+        // 获取 @RpcService 注解标注的类映射信息
+        try {
+            this.handlerMap = RpcServiceScanner.doScannerWithRpcServiceAnnotationFilterAndRegistryService(host, port, scanPackage);
+
+        } catch (Exception e) {
+            log.error("RPC Server init error:", e);
+        }
+    }
 
 }

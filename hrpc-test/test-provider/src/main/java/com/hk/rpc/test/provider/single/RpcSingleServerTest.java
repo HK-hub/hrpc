@@ -1,5 +1,6 @@
 package com.hk.rpc.test.provider.single;
 
+import com.hk.rpc.constants.RpcConstants;
 import com.hk.rpc.provider.nativ.RpcSingleServer;
 import org.junit.Test;
 
@@ -19,7 +20,7 @@ public class RpcSingleServerTest {
     public void testStartSingleServer() {
 
         RpcSingleServer singleServer = new RpcSingleServer("127.0.0.1",
-                27880, "com.hk.rpc.test.provider");
+                27880, "com.hk.rpc.test.provider", RpcConstants.REFLECT_TYPE_CGLIB);
         singleServer.start();
 
     }

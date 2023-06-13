@@ -2,6 +2,7 @@ package com.hk.rpc.provider.common.server.base;
 
 import com.hk.rpc.codec.RpcDecoder;
 import com.hk.rpc.codec.RpcEncoder;
+import com.hk.rpc.constants.RpcConstants;
 import com.hk.rpc.provider.common.handler.RpcProviderHandler;
 import com.hk.rpc.provider.common.server.api.Server;
 import io.netty.bootstrap.ServerBootstrap;
@@ -12,8 +13,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -55,11 +54,21 @@ public class BaseServer implements Server {
 
 
     /**
+     * 调用方法反射类型
+     */
+    protected String reflectType;
+
+    /**
      * 指定地址，端口
      * @param address
      * @param port
      */
     public BaseServer(String address, int port) {
+
+        this(address, port, RpcConstants.REFLECT_TYPE_CGLIB);
+    }
+
+    public BaseServer(String address, int port, String reflectType) {
 
         if (StringUtils.isNotEmpty(address)) {
             this.address = address;
@@ -69,6 +78,8 @@ public class BaseServer implements Server {
             // 非默认零值
             this.port = port;
         }
+
+        this.reflectType = reflectType;
     }
 
 
@@ -94,7 +105,7 @@ public class BaseServer implements Server {
                                     // TODO 预留编解码，需要实现自定义协议
                                     .addLast(new RpcDecoder())
                                     .addLast(new RpcEncoder())
-                                    .addLast(new RpcProviderHandler(handlerMap));
+                                    .addLast(new RpcProviderHandler(reflectType, handlerMap));
                         }
                     })
                     .option(ChannelOption.TCP_NODELAY, true)
