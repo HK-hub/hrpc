@@ -1,6 +1,7 @@
 package com.hk.rpc.common.scanner.server;
 
 import com.hk.rpc.annotation.RpcService;
+import com.hk.rpc.common.helper.RpcServiceHelper;
 import com.hk.rpc.common.scanner.ClassScanner;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -62,7 +63,7 @@ public class RpcServiceScanner extends ClassScanner {
                 String serviceName = getServiceName(annotation);
                 String version = annotation.version();
                 String group = annotation.group();
-                String key = serviceName.concat(version).concat(group);
+                String key = RpcServiceHelper.locationService(serviceName, version, group);
 
                 log.info("当前标注了@RpcService的类实例名称:{}",  clazz.getName());
                 log.info("@RpcService注解上标注的属性信息如下:");
