@@ -9,7 +9,6 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,7 +47,7 @@ public class RpcConsumer {
 
     /**
      * 双检查单例
-     * @return
+     * @return RpcConsumer
      */
     public static RpcConsumer getInstance() {
 
@@ -71,6 +70,12 @@ public class RpcConsumer {
         this.eventLoopGroup.shutdownGracefully();
     }
 
+
+    /**
+     * 将特定服务消费者与服务提供者之间的连接进行缓存
+     * @param protocol
+     * @throws Exception
+     */
     public void sendRequest(RpcProtocol<RpcRequest> protocol) throws Exception {
         //TODO 暂时写死，后续在引入注册中心时，从注册中心获取
         String serviceAddress = "127.0.0.1";
