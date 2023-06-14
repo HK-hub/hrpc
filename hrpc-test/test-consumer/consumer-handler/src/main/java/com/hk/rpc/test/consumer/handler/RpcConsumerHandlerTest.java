@@ -1,6 +1,7 @@
 package com.hk.rpc.test.consumer.handler;
 
 import com.hk.rpc.consumer.common.RpcConsumer;
+import com.hk.rpc.consumer.common.context.RpcContext;
 import com.hk.rpc.consumer.common.future.RPCFuture;
 import com.hk.rpc.protocol.RpcProtocol;
 import com.hk.rpc.protocol.header.RpcHeaderFactory;
@@ -23,12 +24,82 @@ public class RpcConsumerHandlerTest {
     public static void main(String[] args) throws Exception {
         RpcConsumer consumer = RpcConsumer.getInstance();
         RPCFuture future = consumer.sendRequest(getRpcRequestProtocol());
+        // 获取 RPC 调用结果
         Thread.sleep(2000);
+        log.info("从服务消费者获取到的数据:{}", future.get());
         consumer.close();
 
-        // 获取 RPC 调用结果
-        log.info("从服务消费者获取到的数据:{}", future.get());
     }
+
+
+    public static void mainAsync(String[] args) throws Exception {
+        RpcConsumer consumer = RpcConsumer.getInstance();
+        consumer.sendRequest(getRpcRequestProtocolAsync());
+        RPCFuture future = RpcContext.getContext().getRPCFuture();
+        log.info("从服务消费者获取到的数据===>>>" + future.get());
+        consumer.close();
+    }
+
+    public static void mainSync(String[] args) throws Exception {
+        RpcConsumer consumer = RpcConsumer.getInstance();
+        RPCFuture future = consumer.sendRequest(getRpcRequestProtocolSync());
+        log.info("从服务消费者获取到的数据===>>>" + future.get());
+        consumer.close();
+    }
+
+    private static RpcProtocol<RpcRequest> getRpcRequestProtocolOneway(){
+        //模拟发送数据
+        RpcProtocol<RpcRequest> protocol = new RpcProtocol<>();
+        protocol.setHeader(RpcHeaderFactory.getRequestHeader("jdk"));
+        RpcRequest request = new RpcRequest();
+        request.setClassName("com.hk.rpc.test.api.DemoService");
+        request.setGroup("hk-hub");
+        request.setMethodName("hello");
+        request.setParameters(new Object[]{"HK意境"});
+        request.setParameterTypes(new Class[]{String.class});
+        request.setVersion("1.0.0");
+        request.setAsync(false);
+        request.setOneway(true);
+        protocol.setBody(request);
+        return protocol;
+    }
+
+    private static RpcProtocol<RpcRequest> getRpcRequestProtocolAsync(){
+        //模拟发送数据
+        RpcProtocol<RpcRequest> protocol = new RpcProtocol<>();
+        protocol.setHeader(RpcHeaderFactory.getRequestHeader("jdk"));
+        RpcRequest request = new RpcRequest();
+        request.setClassName("com.hk.rpc.test.api.DemoService");
+        request.setGroup("hk-hub");
+        request.setMethodName("hello");
+        request.setParameters(new Object[]{"HK意境"});
+        request.setParameterTypes(new Class[]{String.class});
+        request.setVersion("1.0.0");
+        request.setAsync(true);
+        request.setOneway(false);
+        protocol.setBody(request);
+        return protocol;
+    }
+
+    private static RpcProtocol<RpcRequest> getRpcRequestProtocolSync(){
+        //模拟发送数据
+        RpcProtocol<RpcRequest> protocol = new RpcProtocol<>();
+        protocol.setHeader(RpcHeaderFactory.getRequestHeader("jdk"));
+        RpcRequest request = new RpcRequest();
+        request.setClassName("com.hk.rpc.test.api.DemoService");
+        request.setGroup("hk-hub");
+        request.setMethodName("hello");
+        request.setParameters(new Object[]{"HK意境"});
+        request.setParameterTypes(new Class[]{String.class});
+        request.setVersion("1.0.0");
+        request.setAsync(true);
+        request.setOneway(false);
+        protocol.setBody(request);
+        return protocol;
+    }
+
+
+
 
     private static RpcProtocol<RpcRequest> getRpcRequestProtocol(){
         //模拟发送数据
@@ -42,7 +113,7 @@ public class RpcConsumerHandlerTest {
         request.setParameterTypes(new Class[]{String.class});
         request.setVersion("1.0.0");
         request.setAsync(false);
-        request.setOneway(false);
+        request.setOneway(true);
         protocol.setBody(request);
         return protocol;
     }

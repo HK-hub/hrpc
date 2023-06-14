@@ -2,6 +2,7 @@ package com.hk.rpc.consumer.common.handler;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.hk.rpc.consumer.common.context.RpcContext;
 import com.hk.rpc.consumer.common.future.RPCFuture;
 import com.hk.rpc.protocol.RpcProtocol;
 import com.hk.rpc.protocol.header.RpcHeader;
@@ -16,6 +17,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 
 import java.net.SocketAddress;
 import java.util.Map;
@@ -100,17 +102,67 @@ public class RpcConsumerHandler extends SimpleChannelInboundHandler<RpcProtocol<
     /**
      * 服务消费者向服务提供者发送请求
      */
-    public RPCFuture sendRequest(RpcProtocol<RpcRequest> protocol){
+    public RPCFuture sendRequest(RpcProtocol<RpcRequest> protocol, boolean async, boolean oneway){
+
         log.info("服务消费者发送的数据===>>>{}", JSONObject.toJSONString(protocol));
         channel.writeAndFlush(protocol);
 
+        // 选择对应的调用方式
+        if (BooleanUtils.isTrue(oneway)) {
+            // 单向调用
+            return sendRequestOneway(protocol);
+        }
+
+        if (BooleanUtils.isTrue(async)) {
+            // 异步调用
+            return sendRequestAsync(protocol);
+        }
+
+        // 同步调用
+        return this.sendRequestSync(protocol);
+    }
+
+
+    /**
+     * 同步调用
+     * @param protocol
+     * @return
+     */
+    private RPCFuture sendRequestSync(RpcProtocol<RpcRequest> protocol) {
+        RPCFuture rpcFuture = this.getRpcFuture(protocol);
+        channel.writeAndFlush(protocol);
+        return rpcFuture;
+    }
+
+
+    /**
+     * 异步调用
+     * @param protocol
+     * @return
+     */
+    private RPCFuture sendRequestAsync(RpcProtocol<RpcRequest> protocol) {
+
         // 异步转同步
         RPCFuture rpcFuture = this.getRpcFuture(protocol);
+        // 如果是异步调用，则将RPCFuture 放入 RpcContext 中
+        RpcContext.getContext().setRPCFuture(rpcFuture);
         // 发送协议数据
         this.channel.writeAndFlush(protocol);
 
         return rpcFuture;
     }
+
+
+    /**
+     * 发送单向调用
+     * @param protocol
+     */
+    private RPCFuture sendRequestOneway(RpcProtocol<RpcRequest> protocol) {
+
+        this.channel.writeAndFlush(protocol);
+        return null;
+    }
+
 
     /**
      * 构造RPC 请求 Future

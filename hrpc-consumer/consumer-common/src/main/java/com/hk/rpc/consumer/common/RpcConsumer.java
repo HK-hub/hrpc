@@ -94,7 +94,10 @@ public class RpcConsumer {
             handlerMap.put(key, handler);
         }
 
-        return handler.sendRequest(protocol);
+        // 获取请求配置
+        RpcRequest request = protocol.getBody();
+
+        return handler.sendRequest(protocol, request.isAsync(), request.isOneway());
     }
 
 

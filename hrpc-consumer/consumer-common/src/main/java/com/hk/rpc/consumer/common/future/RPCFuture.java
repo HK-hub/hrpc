@@ -25,7 +25,6 @@ import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 @Slf4j
 public class RPCFuture extends CompletableFuture<Object> {
 
-
     /**
      * 内部类
      */
@@ -99,7 +98,6 @@ public class RPCFuture extends CompletableFuture<Object> {
 
         boolean success = this.sync.tryAcquireNanos(-1, unit.toNanos(timeout));
         if (success) {
-
             if (Objects.nonNull(this.responseRpcProtocol)) {
                 return this.responseRpcProtocol.getBody().getResult();
             } else {
@@ -163,7 +161,7 @@ public class RPCFuture extends CompletableFuture<Object> {
         }
 
         public boolean isDone() {
-
+            getState();
             return getState() == this.done;
         }
 
