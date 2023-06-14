@@ -4,6 +4,7 @@ import com.hk.rpc.consumer.common.RpcConsumer;
 import com.hk.rpc.protocol.RpcProtocol;
 import com.hk.rpc.protocol.header.RpcHeaderFactory;
 import com.hk.rpc.protocol.request.RpcRequest;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author : HK意境
@@ -15,13 +16,17 @@ import com.hk.rpc.protocol.request.RpcRequest;
  * @Modified :
  * @Version : 1.0
  */
+@Slf4j
 public class RpcConsumerHandlerTest {
 
     public static void main(String[] args) throws Exception {
         RpcConsumer consumer = RpcConsumer.getInstance();
-        consumer.sendRequest(getRpcRequestProtocol());
+        Object result = consumer.sendRequest(getRpcRequestProtocol());
         Thread.sleep(2000);
         consumer.close();
+
+        // 获取 RPC 调用结果
+        log.info("从服务消费者获取到的数据:{}", result.toString());
     }
 
     private static RpcProtocol<RpcRequest> getRpcRequestProtocol(){
