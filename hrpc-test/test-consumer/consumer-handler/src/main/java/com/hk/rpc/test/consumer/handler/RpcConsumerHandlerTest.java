@@ -1,6 +1,7 @@
 package com.hk.rpc.test.consumer.handler;
 
 import com.hk.rpc.consumer.common.RpcConsumer;
+import com.hk.rpc.consumer.common.future.RPCFuture;
 import com.hk.rpc.protocol.RpcProtocol;
 import com.hk.rpc.protocol.header.RpcHeaderFactory;
 import com.hk.rpc.protocol.request.RpcRequest;
@@ -21,12 +22,12 @@ public class RpcConsumerHandlerTest {
 
     public static void main(String[] args) throws Exception {
         RpcConsumer consumer = RpcConsumer.getInstance();
-        Object result = consumer.sendRequest(getRpcRequestProtocol());
+        RPCFuture future = consumer.sendRequest(getRpcRequestProtocol());
         Thread.sleep(2000);
         consumer.close();
 
         // 获取 RPC 调用结果
-        log.info("从服务消费者获取到的数据:{}", result.toString());
+        log.info("从服务消费者获取到的数据:{}", future.get());
     }
 
     private static RpcProtocol<RpcRequest> getRpcRequestProtocol(){

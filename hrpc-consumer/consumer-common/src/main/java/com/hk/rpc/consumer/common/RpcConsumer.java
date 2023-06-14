@@ -1,5 +1,6 @@
 package com.hk.rpc.consumer.common;
 
+import com.hk.rpc.consumer.common.future.RPCFuture;
 import com.hk.rpc.consumer.common.handler.RpcConsumerHandler;
 import com.hk.rpc.consumer.common.initializer.RpcConsumerInitializer;
 import com.hk.rpc.protocol.RpcProtocol;
@@ -76,7 +77,7 @@ public class RpcConsumer {
      * @param protocol
      * @throws Exception
      */
-    public Object sendRequest(RpcProtocol<RpcRequest> protocol) throws Exception {
+    public RPCFuture sendRequest(RpcProtocol<RpcRequest> protocol) throws Exception {
         //TODO 暂时写死，后续在引入注册中心时，从注册中心获取
         String serviceAddress = "127.0.0.1";
         int port = 27880;
