@@ -87,13 +87,18 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
 
             } catch (Throwable e) {
                 // 设置错误RPC 响应
-                response.setMessage(e.toString());
+                response.setMessage(e.toString())
+                        .setSuccess(false)
+                        //.setFailure(true)
+                        .setError(true);
                 header.setStatus((byte) RpcStatus.FAILURE.getCode());
 
                 log.error("RPC Server handle request error: ", e);
             }
 
             // 设置响应数据
+            response.setSuccess(true)
+                            .setFailure(false);
             responseRpcProtocol.setHeader(header)
                     .setBody(response);
 

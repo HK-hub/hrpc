@@ -1,5 +1,6 @@
 package com.hk.rpc.consumer.common;
 
+import com.hk.rpc.common.thread.ClientThreadPool;
 import com.hk.rpc.consumer.common.future.RPCFuture;
 import com.hk.rpc.consumer.common.handler.RpcConsumerHandler;
 import com.hk.rpc.consumer.common.initializer.RpcConsumerInitializer;
@@ -69,6 +70,7 @@ public class RpcConsumer {
      */
     public void close() {
         this.eventLoopGroup.shutdownGracefully();
+        ClientThreadPool.shutdown();
     }
 
 

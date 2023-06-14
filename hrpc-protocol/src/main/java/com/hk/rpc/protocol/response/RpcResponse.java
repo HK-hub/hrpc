@@ -30,6 +30,15 @@ public class RpcResponse extends RpcMessage {
      */
     private boolean success;
 
+    /**
+     * 出现异常错误
+     */
+    private boolean error;
+
+    /**
+     * 是否失败
+     */
+    private boolean failure;
 
     /**
      * rpc调用响应码

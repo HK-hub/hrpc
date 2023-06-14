@@ -1,6 +1,7 @@
 package com.hk.rpc.test.consumer.handler;
 
 import com.hk.rpc.consumer.common.RpcConsumer;
+import com.hk.rpc.consumer.common.callback.DefaultAsyncRPCCallback;
 import com.hk.rpc.consumer.common.context.RpcContext;
 import com.hk.rpc.consumer.common.future.RPCFuture;
 import com.hk.rpc.protocol.RpcProtocol;
@@ -21,14 +22,42 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RpcConsumerHandlerTest {
 
+
+
     public static void main(String[] args) throws Exception {
+        mainCallback(args);
+    }
+
+
+    public static void mainCallback(String[] args) throws Exception {
         RpcConsumer consumer = RpcConsumer.getInstance();
         RPCFuture future = consumer.sendRequest(getRpcRequestProtocol());
+        // 添加回调方法
+        future.addCallback(new DefaultAsyncRPCCallback() {
+            @Override
+            public void onSuccess(Object result) {
+                log.info("从服务消费者获取到的数据：{}", result);
+            }
+
+            @Override
+            public void onFailure(Object result) {
+                log.info("RPC调用失败：{}", result);
+            }
+
+            @Override
+            public void onCompleted(Object message) {
+                log.info("RPC 调用已经完成了，收到消息如下：{}", message);
+            }
+
+            @Override
+            public void onException(Exception e) {
+                log.info("出现异常：", e);
+            }
+        });
         // 获取 RPC 调用结果
         Thread.sleep(2000);
-        log.info("从服务消费者获取到的数据:{}", future.get());
+        // log.info("从服务消费者获取到的数据:{}", future.get());
         consumer.close();
-
     }
 
 
@@ -113,7 +142,7 @@ public class RpcConsumerHandlerTest {
         request.setParameterTypes(new Class[]{String.class});
         request.setVersion("1.0.0");
         request.setAsync(false);
-        request.setOneway(true);
+        request.setOneway(false);
         protocol.setBody(request);
         return protocol;
     }

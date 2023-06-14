@@ -1,16 +1,22 @@
 package com.hk.rpc.consumer.common.future;
 
+import com.hk.rpc.common.thread.ClientThreadPool;
+import com.hk.rpc.consumer.common.callback.AsyncRPCCallback;
 import com.hk.rpc.protocol.RpcProtocol;
 import com.hk.rpc.protocol.request.RpcRequest;
 import com.hk.rpc.protocol.response.RpcResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.AbstractQueuedSynchronizer;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author : HK意境
@@ -33,6 +39,17 @@ public class RPCFuture extends CompletableFuture<Object> {
     private RpcProtocol<RpcRequest> requestRpcProtocol;
 
     private RpcProtocol<RpcResponse> responseRpcProtocol;
+
+    /**
+     * 回调接口
+     */
+    private List<AsyncRPCCallback> pendingCallbacks = new ArrayList<>();
+
+    /**
+     * 添加回调方法和执行回调时进行加锁和解锁
+     */
+    private ReentrantLock lock = new ReentrantLock();
+
 
     /**
      * RPC 开始时间
@@ -110,6 +127,77 @@ public class RPCFuture extends CompletableFuture<Object> {
         }
     }
 
+
+    /**
+     * 执行回调方法
+     * @param callback 回调接口
+     */
+    private void runCallback(final AsyncRPCCallback callback) {
+
+        RpcResponse rpcResponse = this.responseRpcProtocol.getBody();
+
+        // 异步执行回调
+        ClientThreadPool.submit(() -> {
+            // 首先执行 完成回调
+            callback.onCompleted(this.responseRpcProtocol);
+
+            // 执行成功，失败，异常等回调
+            if (rpcResponse.isSuccess()) {
+                callback.onSuccess(rpcResponse);
+            }  else {
+                // 是否失败
+                if (BooleanUtils.isTrue(rpcResponse.isFailure())) {
+                    callback.onFailure(rpcResponse);
+                }
+
+                // 执行 错误异常回调
+                callback.onException(new RuntimeException("Response error:", new Throwable(rpcResponse.getMessage())));
+            }
+        });
+    }
+
+
+    /**
+     * 外部服务添加接口回调实例对象到 pendingCallbacks 集合中
+     * @param callback
+     * @return
+     */
+    public RPCFuture addCallback(AsyncRPCCallback callback) {
+        lock.lock();
+        try{
+            if (this.isDone()) {
+                // 执行回调
+                runCallback(callback);
+            } else {
+                this.pendingCallbacks.add(callback);
+            }
+        }catch(Exception e){
+
+        }finally {
+            lock.unlock();
+        }
+        return this;
+    }
+
+
+    /**
+     * 依次执行 callbacks 集合中的回调方法
+     */
+    private void invokeCallbacks() {
+        lock.lock();
+        try{
+            for (AsyncRPCCallback callback : this.pendingCallbacks) {
+                runCallback(callback);
+            }
+        }catch(Exception e){
+            log.error("execute rpc response callback function error:", e);
+
+        }finally {
+            lock.unlock();
+        }
+    }
+
+
     @Override
     public boolean isCancelled() {
         return super.isCancelled();
@@ -129,6 +217,10 @@ public class RPCFuture extends CompletableFuture<Object> {
 
         this.responseRpcProtocol = responseRpcProtocol;
         this.sync.release(1);
+
+        // 执行调用回调
+        this.invokeCallbacks();
+
         // Threshold
         long responseTime = System.currentTimeMillis() - this.startTime;
 
