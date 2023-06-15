@@ -1,6 +1,8 @@
 package com.hk.rpc.consumer;
 
 import com.hk.rpc.consumer.common.RpcConsumer;
+import com.hk.rpc.proxy.api.async.IAsyncObjectProxy;
+import com.hk.rpc.proxy.api.object.ObjectProxy;
 import com.hk.rpc.proxy.jdk.JdkProxyFactory;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -74,6 +76,18 @@ public class RpcClient {
         JdkProxyFactory<T> jdkProxyFactory = new JdkProxyFactory<T>(serviceVersion, serviceGroup, timeout,
                 RpcConsumer.getInstance(), serializationType, async, oneway);
         return jdkProxyFactory.getProxyObject(clazz);
+    }
+
+    /**
+     * 创建异步调用代理对象
+     * @param clazz
+     * @param <T>
+     * @return
+     */
+    public <T> IAsyncObjectProxy createAsync(Class<T> clazz) {
+
+        return new ObjectProxy<T>(clazz, serviceVersion, serviceGroup, timeout,
+                RpcConsumer.getInstance(), serializationType, async, oneway);
     }
 
 

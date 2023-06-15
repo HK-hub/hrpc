@@ -3,6 +3,7 @@ package com.hk.rpc.proxy.api.object;
 import com.hk.rpc.protocol.RpcProtocol;
 import com.hk.rpc.protocol.header.RpcHeaderFactory;
 import com.hk.rpc.protocol.request.RpcRequest;
+import com.hk.rpc.proxy.api.async.IAsyncObjectProxy;
 import com.hk.rpc.proxy.api.consumer.Consumer;
 import com.hk.rpc.proxy.api.future.RPCFuture;
 import lombok.Data;
@@ -27,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Data
 @Accessors(chain = true)
-public class ObjectProxy<T> implements InvocationHandler {
+public class ObjectProxy<T> implements InvocationHandler, IAsyncObjectProxy {
 
     /**
      * 接口的class 对象
@@ -177,6 +178,90 @@ public class ObjectProxy<T> implements InvocationHandler {
             // Object 中的其他方法，暂不支持
             throw new IllegalStateException(String.valueOf(method));
         }
+    }
+
+
+    /**
+     * 异步调用 代理对象方法
+     * @param methodName 方法名称
+     * @param args 方法参数
+     * @return
+     */
+    @Override
+    public RPCFuture call(String methodName, Object... args) {
+
+        RpcProtocol<RpcRequest> protocol = this.createRequest(this.clazz.getName(), methodName, args);
+
+        RPCFuture future = null;
+        // 发起异步调用
+        try {
+            future = this.consumer.sendRequest(protocol);
+        } catch (Exception e) {
+            log.error("async rpc call throws exception:", e);
+        }
+
+        return future;
+    }
+
+
+    /**
+     * 构建请求
+     * @param className 接口类名
+     * @param methodName 方法名称
+     * @param args 目标方法参数集
+     * @return
+     */
+    private RpcProtocol<RpcRequest> createRequest(String className, String methodName, Object[] args) {
+
+        RpcProtocol<RpcRequest> rpcProtocol = new RpcProtocol<>();
+        rpcProtocol.setHeader(RpcHeaderFactory.getRequestHeader(this.serializationType));
+
+        // 构建 请求
+        RpcRequest request = new RpcRequest();
+        request.setClassName(className).setMethodName(methodName).setParameters(args)
+                .setVersion(this.serviceVersion).setGroup(this.serviceGroup);
+
+        // 计算参数类型集合
+        Class[] parameterTypes = new Class[args.length];
+        for (int i = 0; i < args.length; i++) {
+            parameterTypes[i] = this.getParameterType(args[i]);
+        }
+        request.setParameterTypes(parameterTypes);
+        // debug 日志
+        log.debug("rpc request:{}#{},parameterTypes={},parameters={}", className, methodName, Arrays.toString(parameterTypes), Arrays.toString(args));
+
+        rpcProtocol.setBody(request);
+        return rpcProtocol;
+    }
+
+    /**
+     * 获取参数类型
+     * @param arg
+     * @return
+     */
+    private Class getParameterType(Object arg) {
+
+        Class<?> classType = arg.getClass();
+        String typeName = classType.getName();
+        switch (typeName){
+            case "java.lang.Integer":
+                return Integer.TYPE;
+            case "java.lang.Long":
+                return Long.TYPE;
+            case "java.lang.Float":
+                return Float.TYPE;
+            case "java.lang.Double":
+                return Double.TYPE;
+            case "java.lang.Character":
+                return Character.TYPE;
+            case "java.lang.Boolean":
+                return Boolean.TYPE;
+            case "java.lang.Short":
+                return Short.TYPE;
+            case "java.lang.Byte":
+                return Byte.TYPE;
+        }
+        return classType;
     }
 
 

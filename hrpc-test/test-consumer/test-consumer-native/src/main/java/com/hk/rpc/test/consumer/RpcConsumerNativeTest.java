@@ -2,8 +2,14 @@ package com.hk.rpc.test.consumer;
 
 import com.hk.rpc.constants.RpcConstants;
 import com.hk.rpc.consumer.RpcClient;
+import com.hk.rpc.proxy.api.async.IAsyncObjectProxy;
+import com.hk.rpc.proxy.api.future.RPCFuture;
 import com.hk.rpc.test.api.DemoService;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author : HK意境
@@ -18,7 +24,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RpcConsumerNativeTest {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+
+        mainAsync(args);
+    }
+
+    public static void mainSync(String[] args) {
 
         RpcClient rpcClient = new RpcClient("1.0.0", "hk-hub", 3000, RpcConstants.SERIALIZATION_JDK, false, false);
 
@@ -31,6 +42,23 @@ public class RpcConsumerNativeTest {
         log.info("rpc call result={}", res);
         rpcClient.shutdown();
     }
+
+
+    public static void mainAsync(String[] args) throws ExecutionException, InterruptedException, TimeoutException {
+
+        RpcClient rpcClient = new RpcClient("1.0.0", "hk-hub", 3000,
+                RpcConstants.SERIALIZATION_JDK, false, false);
+
+        // 获取代理对象
+        IAsyncObjectProxy proxy = rpcClient.createAsync(DemoService.class);
+
+        // 执行rpc 调用
+        RPCFuture future = proxy.call("hello", "async call");
+
+        log.info("async rpc call result={}", future.get(3000, TimeUnit.MILLISECONDS));
+        rpcClient.shutdown();
+    }
+
 
 
 }
