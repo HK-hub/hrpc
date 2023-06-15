@@ -1,4 +1,4 @@
-package com.hk.rpc.consumer.common.callback;
+package com.hk.rpc.proxy.api.callback;
 
 /**
  * @author : HK意境

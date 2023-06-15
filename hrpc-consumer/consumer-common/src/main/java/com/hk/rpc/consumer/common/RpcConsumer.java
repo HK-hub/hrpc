@@ -1,7 +1,8 @@
 package com.hk.rpc.consumer.common;
 
 import com.hk.rpc.common.thread.ClientThreadPool;
-import com.hk.rpc.consumer.common.future.RPCFuture;
+import com.hk.rpc.proxy.api.consumer.Consumer;
+import com.hk.rpc.proxy.api.future.RPCFuture;
 import com.hk.rpc.consumer.common.handler.RpcConsumerHandler;
 import com.hk.rpc.consumer.common.initializer.RpcConsumerInitializer;
 import com.hk.rpc.protocol.RpcProtocol;
@@ -28,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Version : 1.0
  */
 @Slf4j
-public class RpcConsumer {
+public class RpcConsumer implements Consumer {
 
     private final Bootstrap bootstrap;
 
@@ -77,8 +78,8 @@ public class RpcConsumer {
     /**
      * 将特定服务消费者与服务提供者之间的连接进行缓存
      * @param protocol
-     * @throws Exception
      */
+    @Override
     public RPCFuture sendRequest(RpcProtocol<RpcRequest> protocol) throws Exception {
         //TODO 暂时写死，后续在引入注册中心时，从注册中心获取
         String serviceAddress = "127.0.0.1";

@@ -1,10 +1,10 @@
-package com.hk.rpc.consumer.common.future;
+package com.hk.rpc.proxy.api.future;
 
 import com.hk.rpc.common.thread.ClientThreadPool;
-import com.hk.rpc.consumer.common.callback.AsyncRPCCallback;
 import com.hk.rpc.protocol.RpcProtocol;
 import com.hk.rpc.protocol.request.RpcRequest;
 import com.hk.rpc.protocol.response.RpcResponse;
+import com.hk.rpc.proxy.api.callback.AsyncRPCCallback;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 

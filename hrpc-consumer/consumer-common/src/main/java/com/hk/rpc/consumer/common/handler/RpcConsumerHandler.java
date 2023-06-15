@@ -3,7 +3,7 @@ package com.hk.rpc.consumer.common.handler;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.hk.rpc.consumer.common.context.RpcContext;
-import com.hk.rpc.consumer.common.future.RPCFuture;
+import com.hk.rpc.proxy.api.future.RPCFuture;
 import com.hk.rpc.protocol.RpcProtocol;
 import com.hk.rpc.protocol.header.RpcHeader;
 import com.hk.rpc.protocol.request.RpcRequest;

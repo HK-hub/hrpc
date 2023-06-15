@@ -1,12 +1,12 @@
 package com.hk.rpc.test.consumer.handler;
 
 import com.hk.rpc.consumer.common.RpcConsumer;
-import com.hk.rpc.consumer.common.callback.DefaultAsyncRPCCallback;
 import com.hk.rpc.consumer.common.context.RpcContext;
-import com.hk.rpc.consumer.common.future.RPCFuture;
+import com.hk.rpc.proxy.api.future.RPCFuture;
 import com.hk.rpc.protocol.RpcProtocol;
 import com.hk.rpc.protocol.header.RpcHeaderFactory;
 import com.hk.rpc.protocol.request.RpcRequest;
+import com.hk.rpc.proxy.api.callback.DefaultAsyncRPCCallback;
 import lombok.extern.slf4j.Slf4j;
 
 /**

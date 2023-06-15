@@ -1,6 +1,6 @@
 package com.hk.rpc.consumer.common.context;
 
-import com.hk.rpc.consumer.common.future.RPCFuture;
+import com.hk.rpc.proxy.api.future.RPCFuture;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
