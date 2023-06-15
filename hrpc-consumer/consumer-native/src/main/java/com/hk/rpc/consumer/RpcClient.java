@@ -1,7 +1,9 @@
 package com.hk.rpc.consumer;
 
 import com.hk.rpc.consumer.common.RpcConsumer;
+import com.hk.rpc.proxy.api.ProxyFactory;
 import com.hk.rpc.proxy.api.async.IAsyncObjectProxy;
+import com.hk.rpc.proxy.api.config.ProxyConfig;
 import com.hk.rpc.proxy.api.object.ObjectProxy;
 import com.hk.rpc.proxy.jdk.JdkProxyFactory;
 import lombok.Data;
@@ -73,9 +75,11 @@ public class RpcClient {
      */
     public <T> T create(Class<T> clazz) {
 
-        JdkProxyFactory<T> jdkProxyFactory = new JdkProxyFactory<T>(serviceVersion, serviceGroup, timeout,
-                RpcConsumer.getInstance(), serializationType, async, oneway);
-        return jdkProxyFactory.getProxyObject(clazz);
+        ProxyFactory proxyFactory = new JdkProxyFactory<T>();
+        // 初始化工厂
+        proxyFactory.init(new ProxyConfig<>(clazz, this.serviceVersion, this.serviceGroup, this.timeout, RpcConsumer.getInstance(), this.serializationType, this.async, this.oneway));
+        // 获取代理对象
+        return proxyFactory.getProxy(clazz);
     }
 
     /**

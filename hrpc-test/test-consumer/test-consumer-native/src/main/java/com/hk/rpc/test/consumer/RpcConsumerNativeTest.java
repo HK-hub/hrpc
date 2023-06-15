@@ -26,7 +26,7 @@ public class RpcConsumerNativeTest {
 
     public static void main(String[] args) throws Exception {
 
-        mainAsync(args);
+        mainSync(args);
     }
 
     public static void mainSync(String[] args) {
