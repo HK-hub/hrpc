@@ -19,6 +19,7 @@
         <module>hrpc-serialization</module>
         <module>hrpc-consumer</module>
         <module>hrpc-proxy</module>
+        <module>hrpc-registry</module>
     </modules>
 
     <properties>
