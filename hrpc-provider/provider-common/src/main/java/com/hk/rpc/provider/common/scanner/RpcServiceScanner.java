@@ -1,8 +1,10 @@
-package com.hk.rpc.common.scanner.server;
+package com.hk.rpc.provider.common.scanner;
 
 import com.hk.rpc.annotation.RpcService;
 import com.hk.rpc.common.helper.RpcServiceHelper;
 import com.hk.rpc.common.scanner.ClassScanner;
+import com.hk.rpc.protocol.meta.ServiceMeta;
+import com.hk.rpc.registry.api.RegistryService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -28,7 +30,7 @@ public class RpcServiceScanner extends ClassScanner {
      * @return
      */
     public static Map<String, Object> doScannerWithRpcServiceAnnotationFilterAndRegistryService(
-            String host, int port, String scanPackage /*, RegistryServiceScanner registryService**/) throws IOException {
+            String host, int port, String scanPackage, RegistryService registryService) throws IOException {
 
         Map<String, Object> map = new HashMap<>();
 
@@ -40,7 +42,7 @@ public class RpcServiceScanner extends ClassScanner {
 
         // 处理所有类筛选出服务提供者类
         classNameList.forEach(className -> {
-            filterClassAndBuildMetaData(className, map);
+            filterClassAndBuildMetaData(className, map, host, port, registryService);
         });
 
         return map;
@@ -51,7 +53,8 @@ public class RpcServiceScanner extends ClassScanner {
      * 筛选出RPC服务提供者并且获取元数据，注册服务到注册中心
      * @param className 全类名
      */
-    private static void filterClassAndBuildMetaData(String className, Map<String, Object> handlerMap) {
+    private static void filterClassAndBuildMetaData(String className, Map<String, Object> handlerMap,
+                                                    String host, int port, RegistryService registryService) {
         try {
             Class<?> clazz = Class.forName(className);
             // 获取注解
@@ -64,6 +67,11 @@ public class RpcServiceScanner extends ClassScanner {
                 String version = annotation.version();
                 String group = annotation.group();
                 String key = RpcServiceHelper.locationService(serviceName, version, group);
+
+                // 创建 元数据
+                ServiceMeta serviceMeta = new ServiceMeta(serviceName, version, group, host, port);
+                // 将元数据注册到注册中心
+                registryService.register(serviceMeta);
 
                 log.info("当前标注了@RpcService的类实例名称:{}",  clazz.getName());
                 log.info("@RpcService注解上标注的属性信息如下:");

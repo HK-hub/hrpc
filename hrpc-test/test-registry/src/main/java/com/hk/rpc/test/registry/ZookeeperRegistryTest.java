@@ -4,6 +4,7 @@ import com.hk.rpc.protocol.meta.ServiceMeta;
 import com.hk.rpc.registry.api.RegistryService;
 import com.hk.rpc.registry.api.config.RegistryConfig;
 import com.hk.rpc.registry.zookeeper.ZookeeperRegistryService;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,20 +20,25 @@ import java.io.IOException;
  * @Modified :
  * @Version : 1.0
  */
+@Slf4j
 public class ZookeeperRegistryTest {
 
     private RegistryService registryService;
     private ServiceMeta serviceMeta;
 
+    private String connectString = "47.108.146.141:2181";
+
+
     @Before
     public void init() throws Exception {
 
-        RegistryConfig registryConfig = new RegistryConfig("127.0.0.1:2181", "zookeeper");
+        RegistryConfig registryConfig = new RegistryConfig(connectString, "zookeeper");
 
         this.registryService = new ZookeeperRegistryService();
         registryService.init(registryConfig);
 
-        this.serviceMeta = new ServiceMeta(ZookeeperRegistryTest.class.getName(), "1.0.0", "hk", "127.0.0.1", 8080);
+        this.serviceMeta = new ServiceMeta(ZookeeperRegistryTest.class.getName(), "1.0.0", "hk",
+                "127.0.0.1", 8080);
     }
 
 
@@ -44,11 +50,15 @@ public class ZookeeperRegistryTest {
 
     @Test
     public void testDiscovery() throws Exception {
-        ServiceMeta discovery = this.registryService.discovery(RegistryService.class.getName(), "hk".hashCode());
+
+        testRegister();
+        ServiceMeta discovery = this.registryService.discovery(ZookeeperRegistryTest.class.getName(), "hk".hashCode());
+        log.info("discovery: {}", discovery);
     }
 
     @Test
     public void testUnregister() throws Exception {
+
         this.registryService.unregister(serviceMeta);
     }
 

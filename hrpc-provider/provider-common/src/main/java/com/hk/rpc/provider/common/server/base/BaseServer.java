@@ -5,6 +5,9 @@ import com.hk.rpc.codec.RpcEncoder;
 import com.hk.rpc.constants.RpcConstants;
 import com.hk.rpc.provider.common.handler.RpcProviderHandler;
 import com.hk.rpc.provider.common.server.api.Server;
+import com.hk.rpc.registry.api.RegistryService;
+import com.hk.rpc.registry.api.config.RegistryConfig;
+import com.hk.rpc.registry.zookeeper.ZookeeperRegistryService;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -47,6 +50,12 @@ public class BaseServer implements Server {
      */
     protected int port = 27110;
 
+
+    /**
+     * 服务注册中心
+     */
+    protected RegistryService registryService;
+
     /**
      * 存储实体类关系
      */
@@ -65,10 +74,10 @@ public class BaseServer implements Server {
      */
     public BaseServer(String address, int port) {
 
-        this(address, port, RpcConstants.REFLECT_TYPE_CGLIB);
+        this(address, port, RpcConstants.REFLECT_TYPE_CGLIB, "127.0.0.1:2181", "zookeeper");
     }
 
-    public BaseServer(String address, int port, String reflectType) {
+    public BaseServer(String address, int port, String reflectType, String registryAddress, String registryType) {
 
         if (StringUtils.isNotEmpty(address)) {
             this.address = address;
@@ -80,6 +89,31 @@ public class BaseServer implements Server {
         }
 
         this.reflectType = reflectType;
+
+        // registry service
+        this.registryService = this.createRegistryService(registryAddress, registryType);
+    }
+
+    /**
+     * 创建服务注册与发现的实现类
+     * @param registryAddress
+     * @param registryType
+     * @return
+     */
+    private RegistryService createRegistryService(String registryAddress, String registryType) {
+
+        // TODO 后续扩展支持SPI
+        RegistryService registryService = null;
+
+        try {
+            registryService = new ZookeeperRegistryService();
+            registryService.init(new RegistryConfig(registryAddress, registryType));
+        } catch (Exception e) {
+
+            log.error("create registry service failed:", e);
+        }
+
+        return registryService;
     }
 
 
