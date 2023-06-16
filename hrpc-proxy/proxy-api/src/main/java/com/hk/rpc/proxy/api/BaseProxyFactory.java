@@ -26,7 +26,7 @@ public abstract class BaseProxyFactory<T> implements ProxyFactory{
     @Override
     public <T> void init(ProxyConfig<T> config) {
 
-        this.objectProxy = new ObjectProxy(config.getClazz(), config.getServiceVersion(), config.getServiceGroup(), config.getTimeout(), config.getConsumer(),
-                config.getSerializationType(), config.isAsync(), config.isOneway());
+        this.objectProxy = new ObjectProxy(config.getClazz(), config.getServiceVersion(), config.getServiceGroup(), config.getTimeout(),
+                config.getRegistryService(), config.getConsumer(), config.getSerializationType(), config.isAsync(), config.isOneway());
     }
 }

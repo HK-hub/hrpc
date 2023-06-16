@@ -6,6 +6,7 @@ import com.hk.rpc.protocol.request.RpcRequest;
 import com.hk.rpc.proxy.api.async.IAsyncObjectProxy;
 import com.hk.rpc.proxy.api.consumer.Consumer;
 import com.hk.rpc.proxy.api.future.RPCFuture;
+import com.hk.rpc.registry.api.RegistryService;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,12 @@ import java.util.concurrent.TimeUnit;
 @Data
 @Accessors(chain = true)
 public class ObjectProxy<T> implements InvocationHandler, IAsyncObjectProxy {
+
+
+    /**
+     * 服务注册与发现
+     */
+    private RegistryService registryService;
 
     /**
      * 接口的class 对象
@@ -82,12 +89,13 @@ public class ObjectProxy<T> implements InvocationHandler, IAsyncObjectProxy {
 
 
     public ObjectProxy(Class<T> clazz, String serviceVersion, String serviceGroup,
-                       long timeout, Consumer consumer, String serializationType,
+                       long timeout, RegistryService registryService, Consumer consumer, String serializationType,
                        boolean async, boolean oneway) {
         this.clazz = clazz;
         this.serviceVersion = serviceVersion;
         this.serviceGroup = serviceGroup;
         this.timeout = timeout;
+        this.registryService = registryService;
         this.consumer = consumer;
         this.serializationType = serializationType;
         this.async = async;
@@ -133,7 +141,7 @@ public class ObjectProxy<T> implements InvocationHandler, IAsyncObjectProxy {
         log.debug("rpc request method:parameterTypes={},parameters={}", Arrays.toString(method.getParameterTypes()), Arrays.toString(args));
 
         // 执行 RPC 调用
-        RPCFuture rpcFuture = this.consumer.sendRequest(rpcProtocol);
+        RPCFuture rpcFuture = this.consumer.sendRequest(rpcProtocol, this.registryService);
 
         // 更具调用方式来获取调用结果
         if (Objects.isNull(rpcFuture)) {
@@ -195,7 +203,7 @@ public class ObjectProxy<T> implements InvocationHandler, IAsyncObjectProxy {
         RPCFuture future = null;
         // 发起异步调用
         try {
-            future = this.consumer.sendRequest(protocol);
+            future = this.consumer.sendRequest(protocol, this.registryService);
         } catch (Exception e) {
             log.error("async rpc call throws exception:", e);
         }

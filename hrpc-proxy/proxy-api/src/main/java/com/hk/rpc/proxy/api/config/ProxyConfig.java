@@ -1,6 +1,7 @@
 package com.hk.rpc.proxy.api.config;
 
 import com.hk.rpc.proxy.api.consumer.Consumer;
+import com.hk.rpc.registry.api.RegistryService;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -38,10 +39,19 @@ public class ProxyConfig<T> implements Serializable {
      * 超时时间
      */
     private long timeout;
+
+
+    /**
+     * 服务注册与发现接口
+     */
+    private RegistryService registryService;
+
+
     /**
      * 消费者接口
      */
     private Consumer consumer;
+
 
     /**
      * 序列化类型
@@ -59,11 +69,13 @@ public class ProxyConfig<T> implements Serializable {
     private boolean oneway;
 
 
-    public ProxyConfig(Class<T> clazz, String serviceVersion, String serviceGroup, long timeout, Consumer consumer, String serializationType, boolean async, boolean oneway) {
+    public ProxyConfig(Class<T> clazz, String serviceVersion, String serviceGroup, long timeout,
+                       RegistryService registryService, Consumer consumer, String serializationType, boolean async, boolean oneway) {
         this.clazz = clazz;
         this.serviceVersion = serviceVersion;
         this.serviceGroup = serviceGroup;
         this.timeout = timeout;
+        this.registryService = registryService;
         this.consumer = consumer;
         this.serializationType = serializationType;
         this.async = async;

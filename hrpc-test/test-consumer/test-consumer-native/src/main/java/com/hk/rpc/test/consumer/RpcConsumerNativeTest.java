@@ -6,6 +6,8 @@ import com.hk.rpc.proxy.api.async.IAsyncObjectProxy;
 import com.hk.rpc.proxy.api.future.RPCFuture;
 import com.hk.rpc.test.api.DemoService;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -24,14 +26,21 @@ import java.util.concurrent.TimeoutException;
 @Slf4j
 public class RpcConsumerNativeTest {
 
-    public static void main(String[] args) throws Exception {
+    public static final String registryAddress = "47.108.146.141:2181";
+    public static final String registryType = "zookeeper";
 
-        mainSync(args);
+    private RpcClient rpcClient;
+
+    @Before
+    public void init() {
+        rpcClient = new RpcClient(registryAddress, registryType, "1.0.0", "hk-hub",
+                3000, RpcConstants.SERIALIZATION_JDK, false, false);
     }
 
-    public static void mainSync(String[] args) {
 
-        RpcClient rpcClient = new RpcClient("1.0.0", "hk-hub", 3000, RpcConstants.SERIALIZATION_JDK, false, false);
+    @Test
+    public void testSync() {
+
 
         // 获取代理对象
         DemoService demoService = rpcClient.create(DemoService.class);
@@ -44,10 +53,8 @@ public class RpcConsumerNativeTest {
     }
 
 
-    public static void mainAsync(String[] args) throws ExecutionException, InterruptedException, TimeoutException {
-
-        RpcClient rpcClient = new RpcClient("1.0.0", "hk-hub", 3000,
-                RpcConstants.SERIALIZATION_JDK, false, false);
+    @Test
+    public void testAsync() throws ExecutionException, InterruptedException, TimeoutException {
 
         // 获取代理对象
         IAsyncObjectProxy proxy = rpcClient.createAsync(DemoService.class);

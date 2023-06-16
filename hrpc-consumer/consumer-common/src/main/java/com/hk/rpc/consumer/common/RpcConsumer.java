@@ -1,12 +1,16 @@
 package com.hk.rpc.consumer.common;
 
+import com.hk.rpc.common.helper.RpcServiceHelper;
 import com.hk.rpc.common.thread.ClientThreadPool;
+import com.hk.rpc.consumer.common.helper.RpcConsumerHandlerHelper;
+import com.hk.rpc.protocol.meta.ServiceMeta;
 import com.hk.rpc.proxy.api.consumer.Consumer;
 import com.hk.rpc.proxy.api.future.RPCFuture;
 import com.hk.rpc.consumer.common.handler.RpcConsumerHandler;
 import com.hk.rpc.consumer.common.initializer.RpcConsumerInitializer;
 import com.hk.rpc.protocol.RpcProtocol;
 import com.hk.rpc.protocol.request.RpcRequest;
+import com.hk.rpc.registry.api.RegistryService;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -14,8 +18,9 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
-
+import org.apache.commons.lang3.BooleanUtils;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -70,6 +75,7 @@ public class RpcConsumer implements Consumer {
      * 关闭服务消费者
      */
     public void close() {
+        RpcConsumerHandlerHelper.closeRpcClientHandler();
         this.eventLoopGroup.shutdownGracefully();
         ClientThreadPool.shutdown();
     }
@@ -80,27 +86,39 @@ public class RpcConsumer implements Consumer {
      * @param protocol
      */
     @Override
-    public RPCFuture sendRequest(RpcProtocol<RpcRequest> protocol) throws Exception {
-        //TODO 暂时写死，后续在引入注册中心时，从注册中心获取
-        String serviceAddress = "127.0.0.1";
-        int port = 27880;
-        String key = serviceAddress.concat("_").concat(String.valueOf(port));
-        RpcConsumerHandler handler = handlerMap.get(key);
-        //缓存中无RpcClientHandler
-        if (handler == null){
-            handler = getRpcConsumerHandler(serviceAddress, port);
-            handlerMap.put(key, handler);
-
-        }else if (!handler.getChannel().isActive()){  // 缓存中存在RpcClientHandler，但不活跃
-            handler.close();
-            handler = getRpcConsumerHandler(serviceAddress, port);
-            handlerMap.put(key, handler);
-        }
+    public RPCFuture sendRequest(RpcProtocol<RpcRequest> protocol, RegistryService registryService) throws Exception {
 
         // 获取请求配置
         RpcRequest request = protocol.getBody();
+        String serviceKey = RpcServiceHelper.locationService(request.getClassName(), request.getVersion(), request.getGroup());
 
-        return handler.sendRequest(protocol, request.isAsync(), request.isOneway());
+        Object[] parameters = request.getParameters();
+        int invokerHashCode = 0;
+        if (parameters == null || parameters.length == 0) {
+            invokerHashCode = serviceKey.hashCode();
+        } else {
+            invokerHashCode = parameters[0].hashCode();
+        }
+
+        // 服务发现
+        ServiceMeta serviceMeta = registryService.discovery(serviceKey, invokerHashCode);
+        if (Objects.nonNull(serviceMeta)) {
+            RpcConsumerHandler handler = RpcConsumerHandlerHelper.get(serviceMeta);
+            // 缓存中无 handler
+            if (Objects.isNull(handler)) {
+                handler = getRpcConsumerHandler(serviceMeta.getServiceAddress(), serviceMeta.getPort());
+                RpcConsumerHandlerHelper.put(serviceMeta, handler);
+            } else if (BooleanUtils.isFalse(handler.getChannel().isActive())) {
+                // 存在handler 但是不活跃
+                handler.close();
+                handler = getRpcConsumerHandler(serviceMeta.getServiceAddress(), serviceMeta.getPort());
+                RpcConsumerHandlerHelper.put(serviceMeta, handler);
+            }
+
+            return handler.sendRequest(protocol, request.isAsync(), request.isOneway());
+        }
+
+        return null;
     }
 
 

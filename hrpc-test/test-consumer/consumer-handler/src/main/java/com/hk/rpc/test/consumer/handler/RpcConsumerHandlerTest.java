@@ -31,7 +31,7 @@ public class RpcConsumerHandlerTest {
 
     public static void mainCallback(String[] args) throws Exception {
         RpcConsumer consumer = RpcConsumer.getInstance();
-        RPCFuture future = consumer.sendRequest(getRpcRequestProtocol());
+        RPCFuture future = consumer.sendRequest(getRpcRequestProtocol(), null);
         // 添加回调方法
         future.addCallback(new DefaultAsyncRPCCallback() {
             @Override
@@ -63,7 +63,7 @@ public class RpcConsumerHandlerTest {
 
     public static void mainAsync(String[] args) throws Exception {
         RpcConsumer consumer = RpcConsumer.getInstance();
-        consumer.sendRequest(getRpcRequestProtocolAsync());
+        // consumer.sendRequest(getRpcRequestProtocolAsync());
         RPCFuture future = RpcContext.getContext().getRPCFuture();
         log.info("从服务消费者获取到的数据===>>>" + future.get());
         consumer.close();
@@ -71,7 +71,7 @@ public class RpcConsumerHandlerTest {
 
     public static void mainSync(String[] args) throws Exception {
         RpcConsumer consumer = RpcConsumer.getInstance();
-        RPCFuture future = consumer.sendRequest(getRpcRequestProtocolSync());
+        RPCFuture future = consumer.sendRequest(getRpcRequestProtocolSync(), null);
         log.info("从服务消费者获取到的数据===>>>" + future.get());
         consumer.close();
     }

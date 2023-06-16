@@ -3,6 +3,7 @@ package com.hk.rpc.proxy.api.consumer;
 import com.hk.rpc.protocol.RpcProtocol;
 import com.hk.rpc.protocol.request.RpcRequest;
 import com.hk.rpc.proxy.api.future.RPCFuture;
+import com.hk.rpc.registry.api.RegistryService;
 
 /**
  * @author : HK意境
@@ -21,6 +22,6 @@ public interface Consumer {
      * @param protocol
      * @return
      */
-    public RPCFuture sendRequest(RpcProtocol<RpcRequest> protocol) throws Exception;
+    public RPCFuture sendRequest(RpcProtocol<RpcRequest> protocol, RegistryService registryService) throws Exception;
 
 }
