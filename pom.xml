@@ -20,6 +20,7 @@
         <module>hrpc-consumer</module>
         <module>hrpc-proxy</module>
         <module>hrpc-registry</module>
+        <module>hrpc-loadbalance</module>
     </modules>
 
     <properties>

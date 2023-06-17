@@ -1,6 +1,8 @@
 package com.hk.rpc.registry.zookeeper;
 
 import com.hk.rpc.common.helper.RpcServiceHelper;
+import com.hk.rpc.loadbalance.api.ServiceLoadbalancer;
+import com.hk.rpc.loadbalance.random.RandomServiceLoadbalancer;
 import com.hk.rpc.protocol.meta.ServiceMeta;
 import com.hk.rpc.registry.api.RegistryService;
 import com.hk.rpc.registry.api.config.RegistryConfig;
@@ -51,7 +53,12 @@ public class ZookeeperRegistryService implements RegistryService {
     /**
      * 服务注册与发现的实例
      */
-    public ServiceDiscovery<ServiceMeta> serviceDiscovery;
+    private ServiceDiscovery<ServiceMeta> serviceDiscovery;
+
+    /**
+     * 复制均衡器
+     */
+    private ServiceLoadbalancer<ServiceInstance<ServiceMeta>> serviceLoadbalancer;
 
 
     /**
@@ -71,6 +78,8 @@ public class ZookeeperRegistryService implements RegistryService {
                 .serializer(new JsonInstanceSerializer<>(ServiceMeta.class))
                 .build();
 
+        // 负载均衡器
+        this.serviceLoadbalancer = new RandomServiceLoadbalancer<>();
         // 启动服务发现注册
         this.serviceDiscovery.start();
     }
@@ -130,7 +139,7 @@ public class ZookeeperRegistryService implements RegistryService {
         Collection<ServiceInstance<ServiceMeta>> serviceInstances = this.serviceDiscovery.queryForInstances(serviceName);
 
         // 选择其中一个
-        ServiceInstance<ServiceMeta> instance = this.selectOneServiceInstance((List<ServiceInstance<ServiceMeta>>)serviceInstances);
+        ServiceInstance<ServiceMeta> instance = this.selectOneServiceInstance((List<ServiceInstance<ServiceMeta>>)serviceInstances, invokerHashCode);
 
         if (Objects.nonNull(instance)) {
             return instance.getPayload();
@@ -154,17 +163,10 @@ public class ZookeeperRegistryService implements RegistryService {
      * @param serviceInstances 服务实例集合
      * @return {@link ServiceInstance<ServiceMeta>}
      */
-    private ServiceInstance<ServiceMeta> selectOneServiceInstance(List<ServiceInstance<ServiceMeta>> serviceInstances) {
+    private ServiceInstance<ServiceMeta> selectOneServiceInstance(List<ServiceInstance<ServiceMeta>> serviceInstances, int hashCode) {
 
-        if (CollectionUtils.isEmpty(serviceInstances)) {
-            return null;
-        }
-
-        // 随机
-        Random random = new Random();
-        int index = random.nextInt(serviceInstances.size());
-
-        return serviceInstances.get(index);
+        // 使用负载均衡器进行选择
+        return this.serviceLoadbalancer.select(serviceInstances, hashCode);
     }
 
 

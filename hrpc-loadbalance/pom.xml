@@ -9,24 +9,16 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>hrpc-registry</artifactId>
+    <artifactId>hrpc-loadbalance</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>registry-api</module>
-        <module>registry-zookeeper</module>
+        <module>loadbalance-api</module>
+        <module>loadbalance-random</module>
     </modules>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
-
-    <dependencies>
-        <dependency>
-            <groupId>com.hk.rpc</groupId>
-            <artifactId>hrpc-loadbalance</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-    </dependencies>
 
 </project>
