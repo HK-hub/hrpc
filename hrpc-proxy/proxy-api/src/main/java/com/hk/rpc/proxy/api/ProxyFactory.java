@@ -1,6 +1,7 @@
 package com.hk.rpc.proxy.api;
 
 import com.hk.rpc.proxy.api.config.ProxyConfig;
+import com.hk.rpc.spi.annotation.SPI;
 
 /**
  * @author : HK意境
@@ -12,6 +13,7 @@ import com.hk.rpc.proxy.api.config.ProxyConfig;
  * @Modified :
  * @Version : 1.0
  */
+@SPI
 public interface ProxyFactory {
 
     /**

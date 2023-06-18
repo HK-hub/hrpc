@@ -3,6 +3,8 @@ package com.hk.rpc.proxy.jdk;
 import com.hk.rpc.proxy.api.BaseProxyFactory;
 import com.hk.rpc.proxy.api.consumer.Consumer;
 import com.hk.rpc.proxy.api.object.ObjectProxy;
+import com.hk.rpc.spi.annotation.SPIClass;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Proxy;
 
@@ -16,6 +18,8 @@ import java.lang.reflect.Proxy;
  * @Modified :
  * @Version : 1.0
  */
+@Slf4j
+@SPIClass
 public class JdkProxyFactory<T> extends BaseProxyFactory<T> {
 
 
@@ -26,6 +30,8 @@ public class JdkProxyFactory<T> extends BaseProxyFactory<T> {
      */
     @Override
     public <T> T getProxy(Class<T> clazz) {
+
+        log.debug("base jdk proxy...");
         return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz}, this.objectProxy);
     }
 }

@@ -10,6 +10,7 @@ import com.hk.rpc.proxy.jdk.JdkProxyFactory;
 import com.hk.rpc.registry.api.RegistryService;
 import com.hk.rpc.registry.api.config.RegistryConfig;
 import com.hk.rpc.registry.zookeeper.ZookeeperRegistryService;
+import com.hk.rpc.spi.loader.ExtensionLoader;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -28,7 +29,14 @@ import org.apache.commons.lang3.StringUtils;
 @Data
 public class RpcClient {
 
+    /**
+     * 动态代理实现方式
+     */
+    private String proxyType;
 
+    /**
+     * 服务注册与发现
+     */
     private RegistryService registryService;
 
     /**
@@ -65,8 +73,10 @@ public class RpcClient {
     private boolean oneway;
 
 
-    public RpcClient(String registryAddress, String registryType, String serviceVersion, String serviceGroup, long timeout,
+    public RpcClient(String registryAddress, String registryType, String proxyType, String serviceVersion, String serviceGroup, long timeout,
                      String serializationType, boolean async, boolean oneway) {
+
+        this.proxyType = proxyType;
         this.serviceVersion = serviceVersion;
         this.serviceGroup = serviceGroup;
         this.timeout = timeout;
@@ -110,7 +120,7 @@ public class RpcClient {
      */
     public <T> T create(Class<T> clazz) {
 
-        ProxyFactory proxyFactory = new JdkProxyFactory<T>();
+        ProxyFactory proxyFactory = ExtensionLoader.getExtension(ProxyFactory.class, this.proxyType);
         // 初始化工厂
         proxyFactory.init(new ProxyConfig<>(clazz, this.serviceVersion, this.serviceGroup, this.timeout, this.registryService, RpcConsumer.getInstance(), this.serializationType, this.async, this.oneway));
         // 获取代理对象
