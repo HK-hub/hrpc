@@ -34,7 +34,7 @@ public class RpcConsumerNativeTest {
     @Before
     public void init() {
         rpcClient = new RpcClient(registryAddress, registryType, "1.0.0", "hk-hub",
-                3000, RpcConstants.SERIALIZATION_HESSIAN2, false, false);
+                3000, RpcConstants.SERIALIZATION_FST, false, false);
     }
 
 
