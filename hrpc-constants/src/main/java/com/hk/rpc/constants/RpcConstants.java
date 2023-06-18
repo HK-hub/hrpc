@@ -52,6 +52,8 @@ public class RpcConstants {
      */
     public static final String PROXY_CGLIB = "cglib";
 
+    public static final String PROXY_BYTEBUDDY = "bytebuddy";
+
 
     /**
      * 初始化的方法

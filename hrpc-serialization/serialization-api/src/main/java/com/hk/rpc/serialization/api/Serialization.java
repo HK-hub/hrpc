@@ -7,13 +7,13 @@ import com.hk.rpc.spi.annotation.SPI;
  * @author : HK意境
  * @ClassName : Serialization
  * @date : 2023/6/10 14:23
- * @description : 默认 JDK 序列化
+ * @description : 默认 Protobuf 序列化
  * @Todo :
  * @Bug :
  * @Modified :
  * @Version : 1.0
  */
-@SPI(RpcConstants.SERIALIZATION_JDK)
+@SPI(RpcConstants.SERIALIZATION_PROTOBUF)
 public interface Serialization {
 
     /**

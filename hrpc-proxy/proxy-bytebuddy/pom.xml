@@ -3,13 +3,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>hrpc-consumer</artifactId>
+        <artifactId>hrpc-proxy</artifactId>
         <groupId>com.hk.rpc</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>consumer-common</artifactId>
+    <artifactId>proxy-bytebuddy</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -18,29 +18,16 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.alibaba.fastjson2</groupId>
-            <artifactId>fastjson2</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.hk.rpc</groupId>
             <artifactId>proxy-api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.hk.rpc</groupId>
-            <artifactId>proxy-cglib</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>${bytebuddy.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.hk.rpc</groupId>
-            <artifactId>proxy-javassist</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.hk.rpc</groupId>
-            <artifactId>proxy-bytebuddy</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
+
     </dependencies>
 
 </project>

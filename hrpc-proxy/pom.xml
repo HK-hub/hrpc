@@ -16,6 +16,7 @@
         <module>proxy-jdk</module>
         <module>proxy-cglib</module>
         <module>proxy-javassist</module>
+        <module>proxy-bytebuddy</module>
     </modules>
 
     <properties>
