@@ -83,7 +83,7 @@ public class RpcConstants {
     /**
      * protostuff 序列化
      */
-    public static final String SERIALIZATION_PROTOSTUFF = "protostuff";
+    public static final String SERIALIZATION_PROTOBUF = "protobuf";
     /**
      * FST 序列化
      */
