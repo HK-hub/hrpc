@@ -1,0 +1,1 @@
+kryo=com.hk.rpc.serialization.kryo.KryoSerialization
