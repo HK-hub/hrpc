@@ -17,6 +17,10 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 public @interface SPI {
 
+    /**
+     * SPI 接口实现默认值
+     * @return
+     */
     String value() default "";
 
 }

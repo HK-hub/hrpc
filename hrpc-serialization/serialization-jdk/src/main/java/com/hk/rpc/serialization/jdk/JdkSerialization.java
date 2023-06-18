@@ -2,6 +2,8 @@ package com.hk.rpc.serialization.jdk;
 
 import com.hk.rpc.common.exception.SerializeException;
 import com.hk.rpc.serialization.api.Serialization;
+import com.hk.rpc.spi.annotation.SPIClass;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 
@@ -15,11 +17,14 @@ import java.io.*;
  * @Modified :
  * @Version : 1.0
  */
+@SPIClass
+@Slf4j
 public class JdkSerialization implements Serialization {
 
     @Override
     public <T> byte[] serialize(T obj) {
 
+        log.debug("executing jdk serialization...");
         if (obj == null) {
             throw new SerializeException("serialize object is null");
         }
@@ -38,6 +43,7 @@ public class JdkSerialization implements Serialization {
     @Override
     public <T> T deserialize(byte[] data, Class<T> clazz) {
 
+        log.debug("executing jdk deserialization...");
         if (data == null){
             throw new SerializeException("deserialize data is null");
         }

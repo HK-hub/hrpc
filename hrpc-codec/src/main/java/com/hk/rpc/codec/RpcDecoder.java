@@ -79,7 +79,7 @@ public class RpcDecoder extends ByteToMessageDecoder implements RpcCodec{
                 .setSerializationType(serializationType)
                 .setMsgLength(bodyLength);
         // 2.反序列化出消息体
-        Serialization serialization = this.getJdkSerialization();
+        Serialization serialization = this.getSerialization(serializationType);
         switch (rpcType) {
             case REQUEST:
                 RpcRequest rpcRequest = serialization.deserialize(data, RpcRequest.class);

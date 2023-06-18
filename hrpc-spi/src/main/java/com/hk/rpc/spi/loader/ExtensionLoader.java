@@ -27,7 +27,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ExtensionLoader<T> {
 
 
+    /**
+     * SPI 扩展默认路径
+     */
     private static final String SERVICES_DIRECTORY = "META-INF/services/";
+    /**
+     * SPI 扩展自定义路径
+     */
     private static final String HK_DIRECTORY = "META-INF/hk/";
     private static final String HK_DIRECTORY_EXTERNAL = "META-INF/hk/external/";
     private static final String HK_DIRECTORY_INTERNAL = "META-INF/hk/internal/";
