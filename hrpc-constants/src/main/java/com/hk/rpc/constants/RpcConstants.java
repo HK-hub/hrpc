@@ -42,7 +42,6 @@ public class RpcConstants {
      */
     public static final String PROXY_JDK = "jdk";
 
-
     /**
      * javassist 动态代理
      */
