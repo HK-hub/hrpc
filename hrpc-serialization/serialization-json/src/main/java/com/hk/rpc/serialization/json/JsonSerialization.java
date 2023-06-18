@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat;
 
 /**
  * @author : HK意境
- * @ClassName : JdkSerialization
+ * @ClassName : JsonSerialization
  * @date : 2023/6/10 14:26
  * @description :
  * @Todo :

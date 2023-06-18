@@ -52,7 +52,15 @@ public class RpcConstants {
      */
     public static final String PROXY_CGLIB = "cglib";
 
+    /**
+     * ByteBuddy 动态代理
+     */
     public static final String PROXY_BYTEBUDDY = "bytebuddy";
+
+    /**
+     * ASM 动态代理
+     */
+    public static final String PROXY_ASM = "asm";
 
 
     /**
@@ -76,6 +84,7 @@ public class RpcConstants {
      * etcd
      */
     public static final String REGISTRY_CENTER_ETCD = "etcd";
+
     /**
      * eureka
      */

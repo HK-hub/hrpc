@@ -18,7 +18,7 @@ import java.util.Objects;
 
 /**
  * @author : HK意境
- * @ClassName : JdkSerialization
+ * @ClassName : HessianSerialization
  * @date : 2023/6/10 14:26
  * @description :
  * @Todo :

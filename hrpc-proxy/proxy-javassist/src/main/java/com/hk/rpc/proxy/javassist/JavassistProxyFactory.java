@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author : HK意境
- * @ClassName : CglibProxyFactory
+ * @ClassName : JavassistProxyFactory
  * @date : 2023/6/18 18:38
  * @description :
  * @Todo :

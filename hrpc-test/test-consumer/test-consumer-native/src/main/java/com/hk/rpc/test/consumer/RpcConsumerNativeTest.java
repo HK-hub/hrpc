@@ -33,7 +33,7 @@ public class RpcConsumerNativeTest {
 
     @Before
     public void init() {
-        rpcClient = new RpcClient(registryAddress, registryType, RpcConstants.PROXY_BYTEBUDDY, "1.0.0", "hk-hub",
+        rpcClient = new RpcClient(registryAddress, registryType, RpcConstants.PROXY_ASM, "1.0.0", "hk-hub",
                 3000, RpcConstants.SERIALIZATION_PROTOBUF, false, false);
     }
 

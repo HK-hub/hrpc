@@ -9,7 +9,7 @@ import org.nustaq.serialization.FSTConfiguration;
 
 /**
  * @author : HK意境
- * @ClassName : JdkSerialization
+ * @ClassName : FstSerialization
  * @date : 2023/6/10 14:26
  * @description :
  * @Todo :

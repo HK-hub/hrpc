@@ -15,7 +15,7 @@ import java.io.ByteArrayOutputStream;
 
 /**
  * @author : HK意境
- * @ClassName : JdkSerialization
+ * @ClassName : KryoSerialization
  * @date : 2023/6/10 14:26
  * @description :
  * @Todo :

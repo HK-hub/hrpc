@@ -9,7 +9,7 @@ import net.bytebuddy.implementation.InvocationHandlerAdapter;
 
 /**
  * @author : HK意境
- * @ClassName : CglibProxyFactory
+ * @ClassName : ByteBuddyProxyFactory
  * @date : 2023/6/18 18:38
  * @description :
  * @Todo :
