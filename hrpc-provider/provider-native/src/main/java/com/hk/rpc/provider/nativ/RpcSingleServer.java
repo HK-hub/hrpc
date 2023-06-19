@@ -49,6 +49,7 @@ public class RpcSingleServer extends BaseServer {
         } catch (Exception e) {
             log.error("RPC Server init error:", e);
         }
+        log.info("start rpc server success with address={}, port={}, register={} of {}", host, port, registryAddress, registryType);
     }
 
 }

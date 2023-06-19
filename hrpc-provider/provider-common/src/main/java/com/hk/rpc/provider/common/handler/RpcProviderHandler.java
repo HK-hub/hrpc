@@ -10,6 +10,8 @@ import com.hk.rpc.protocol.enumeration.RpcType;
 import com.hk.rpc.protocol.header.RpcHeader;
 import com.hk.rpc.protocol.request.RpcRequest;
 import com.hk.rpc.protocol.response.RpcResponse;
+import com.hk.rpc.reflect.api.ReflectInvoker;
+import com.hk.rpc.spi.loader.ExtensionLoader;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -39,15 +41,14 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
 
     private final Map<String, Object> handlerMap;
 
-    // 调用采用哪种类型调用真实方法
-    private final String reflectType;
+    private ReflectInvoker reflectInvoker;
 
     public RpcProviderHandler(Map<String, Object> handlerMap) {
         this(RpcConstants.REFLECT_TYPE_CGLIB, handlerMap);
     }
 
     public RpcProviderHandler(String reflectType, Map<String, Object> handlerMap) {
-        this.reflectType = reflectType;
+        reflectInvoker = ExtensionLoader.getExtension(ReflectInvoker.class, reflectType);
         this.handlerMap = handlerMap;
     }
 
@@ -161,17 +162,10 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
     private Object invokeMethod(Object serviceBean, Class<?> serviceClass, String methodName, Class<?>[] parameterTypes, Object[] parameters) throws Exception {
 
         Object result = null;
+
         // 确定调用方式
-        switch (this.reflectType) {
-            case RpcConstants.REFLECT_TYPE_JDK:
-                result = this.invokeMethodByJdk(serviceBean, serviceClass, methodName, parameterTypes, parameters);
-                break;
-            case RpcConstants.REFLECT_TYPE_CGLIB:
-                result = this.invokeMethodByCglib(serviceBean, serviceClass, methodName, parameterTypes, parameters);
-                break;
-            default:
-                throw new IllegalArgumentException("Unsupported reflection type");
-        }
+        result = this.reflectInvoker.invokeMethod(serviceBean, serviceClass, methodName, parameterTypes, parameters);
+        log.debug("rpc provider invoked method={}#{}, result={}", serviceClass.getName(), methodName, result);
 
         return result;
     }
@@ -196,34 +190,6 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
         // 执行方法
         return method.invoke(serviceBean, parameters);
     }
-
-
-    /**
-     * JDK 反射调用方法
-     * @param serviceBean 服务Bean
-     * @param serviceClass 服务类
-     * @param methodName 目标方法
-     * @param parameterTypes 方法参数类型集合
-     * @param parameters 方法参数集合
-     * @return Object result 反射调用方法的结果
-     */
-    private Object invokeMethodByJdk(Object serviceBean, Class<?> serviceClass, String methodName, Class<?>[] parameterTypes, Object[] parameters) throws Exception {
-
-        log.info("use jdk reflect type invoke method...");
-        // 获取目标方法
-        Method method = serviceClass.getMethod(methodName, parameterTypes);
-
-        // 设置访问权限
-        method.setAccessible(true);
-
-        // 调用方法
-        Object result = method.invoke(serviceBean, parameters);
-
-        return result;
-    }
-
-
-
 
 
     /**
