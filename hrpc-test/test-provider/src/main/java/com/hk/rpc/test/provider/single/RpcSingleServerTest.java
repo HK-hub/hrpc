@@ -19,7 +19,7 @@ public class RpcSingleServerTest {
     @Test
     public void testStartSingleServer() {
 
-        RpcSingleServer singleServer = new RpcSingleServer("127.0.0.1", 27880, "com.hk.rpc.test.provider", RpcConstants.REFLECT_TYPE_JDK,
+        RpcSingleServer singleServer = new RpcSingleServer("127.0.0.1", 27880, "com.hk.rpc.test.provider", RpcConstants.REFLECT_TYPE_JAVASSIST,
                 "47.108.146.141:2181", "zookeeper");
         singleServer.start();
     }

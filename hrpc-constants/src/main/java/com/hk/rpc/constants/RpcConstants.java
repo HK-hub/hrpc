@@ -38,6 +38,22 @@ public class RpcConstants {
     public static final String REFLECT_TYPE_CGLIB = "cglib";
 
     /**
+     * 反射类型：javassist
+     */
+    public static final String REFLECT_TYPE_JAVASSIST = "javassist";
+
+    /**
+     * 反射类型: ByteBuddy
+     */
+    public static final String REFLECT_TYPE_BYTEBUDDY = "bytebuddy";
+
+    /**
+     * 反射类型: ASM
+     */
+    public static final String REFLECT_TYPE_ASM = "asm";
+
+
+    /**
      * JDK动态代理
      */
     public static final String PROXY_JDK = "jdk";

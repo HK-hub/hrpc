@@ -6,7 +6,6 @@ import com.hk.rpc.proxy.api.ProxyFactory;
 import com.hk.rpc.proxy.api.async.IAsyncObjectProxy;
 import com.hk.rpc.proxy.api.config.ProxyConfig;
 import com.hk.rpc.proxy.api.object.ObjectProxy;
-import com.hk.rpc.proxy.jdk.JdkProxyFactory;
 import com.hk.rpc.registry.api.RegistryService;
 import com.hk.rpc.registry.api.config.RegistryConfig;
 import com.hk.rpc.registry.zookeeper.ZookeeperRegistryService;

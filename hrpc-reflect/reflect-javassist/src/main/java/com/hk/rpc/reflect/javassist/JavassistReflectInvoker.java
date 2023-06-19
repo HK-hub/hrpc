@@ -1,16 +1,20 @@
-package com.hk.rpc.reflect.jdk;
+package com.hk.rpc.reflect.javassist;
 
 import com.hk.rpc.reflect.api.ReflectInvoker;
 import com.hk.rpc.spi.annotation.SPIClass;
+import javassist.util.proxy.ProxyFactory;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.cglib.reflect.FastClass;
+import net.sf.cglib.reflect.FastMethod;
 
+import javax.swing.*;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
 /**
  * @author : HK意境
- * @ClassName : JdkReflectInvoker
- * @date : 2023/6/19 14:16
+ * @ClassName : JavassistReflectInvoker
+ * @date : 2023/6/19 15:04
  * @description :
  * @Todo :
  * @Bug :
@@ -19,11 +23,10 @@ import java.util.Arrays;
  */
 @Slf4j
 @SPIClass
-public class JdkReflectInvoker implements ReflectInvoker {
-
+public class JavassistReflectInvoker implements ReflectInvoker {
 
     /**
-     * JDK 实现反射调用
+     * javassist 实现反射调用真实方法
      * @param serviceBean 服务实例
      * @param serviceClass 服务实例类型
      * @param methodName 真实方法名称
@@ -35,12 +38,19 @@ public class JdkReflectInvoker implements ReflectInvoker {
     @Override
     public Object invokeMethod(Object serviceBean, Class<?> serviceClass, String methodName, Class<?>[] parameterTypes, Object[] parameters) throws Exception {
 
-        log.debug("use jdk reflect type invoke method:{}#{},parameterTypes={}, parameters={}", serviceClass.getName(), methodName,
+        log.debug("use javassist reflect type invoke method:{}#{},parameterTypes={}, parameters={}", serviceClass.getName(), methodName,
                 Arrays.toString(parameterTypes), Arrays.toString(parameters));
 
-        Method method = serviceClass.getMethod(methodName, parameterTypes);
+        // 获取类
+        ProxyFactory proxyFactory = new ProxyFactory();
+        proxyFactory.setSuperclass(serviceClass);
+        Class<?> childClass = proxyFactory.createClass();
+
+        // 获取方法
+        Method method = childClass.getMethod(methodName, parameterTypes);
         method.setAccessible(true);
 
-        return method.invoke(serviceBean, parameters);
+        // 执行方法
+        return method.invoke(childClass.newInstance(), parameters);
     }
 }
