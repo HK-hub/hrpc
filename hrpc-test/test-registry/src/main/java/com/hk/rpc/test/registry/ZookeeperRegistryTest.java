@@ -1,5 +1,6 @@
 package com.hk.rpc.test.registry;
 
+import com.hk.rpc.constants.RpcConstants;
 import com.hk.rpc.protocol.meta.ServiceMeta;
 import com.hk.rpc.registry.api.RegistryService;
 import com.hk.rpc.registry.api.config.RegistryConfig;
@@ -32,7 +33,7 @@ public class ZookeeperRegistryTest {
     @Before
     public void init() throws Exception {
 
-        RegistryConfig registryConfig = new RegistryConfig(connectString, "zookeeper");
+        RegistryConfig registryConfig = new RegistryConfig(connectString, "zookeeper", RpcConstants.SERVICE_LOAD_BALANCER_RANDOM);
 
         this.registryService = new ZookeeperRegistryService();
         registryService.init(registryConfig);

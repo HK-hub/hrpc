@@ -100,7 +100,7 @@ public class RpcConsumer implements Consumer {
             invokerHashCode = parameters[0].hashCode();
         }
 
-        // 服务发现
+        // 服务发现: 负载均衡的进行服务发现
         ServiceMeta serviceMeta = registryService.discovery(serviceKey, invokerHashCode);
         if (Objects.nonNull(serviceMeta)) {
             RpcConsumerHandler handler = RpcConsumerHandlerHelper.get(serviceMeta);

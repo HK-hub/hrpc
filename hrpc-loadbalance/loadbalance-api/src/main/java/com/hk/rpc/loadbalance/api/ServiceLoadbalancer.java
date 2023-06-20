@@ -1,5 +1,8 @@
 package com.hk.rpc.loadbalance.api;
 
+import com.hk.rpc.constants.RpcConstants;
+import com.hk.rpc.spi.annotation.SPI;
+
 import java.util.List;
 
 /**
@@ -12,6 +15,7 @@ import java.util.List;
  * @Modified :
  * @Version : 1.0
  */
+@SPI(RpcConstants.SERVICE_LOAD_BALANCER_RANDOM)
 public interface ServiceLoadbalancer<T> {
 
 

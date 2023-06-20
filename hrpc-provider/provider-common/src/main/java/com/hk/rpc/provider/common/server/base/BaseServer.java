@@ -2,7 +2,6 @@ package com.hk.rpc.provider.common.server.base;
 
 import com.hk.rpc.codec.RpcDecoder;
 import com.hk.rpc.codec.RpcEncoder;
-import com.hk.rpc.constants.RpcConstants;
 import com.hk.rpc.provider.common.handler.RpcProviderHandler;
 import com.hk.rpc.provider.common.server.api.Server;
 import com.hk.rpc.registry.api.RegistryService;
@@ -72,12 +71,7 @@ public class BaseServer implements Server {
      * @param address
      * @param port
      */
-    public BaseServer(String address, int port) {
-
-        this(address, port, RpcConstants.REFLECT_TYPE_CGLIB, "127.0.0.1:2181", "zookeeper");
-    }
-
-    public BaseServer(String address, int port, String reflectType, String registryAddress, String registryType) {
+    public BaseServer(String address, int port, String reflectType, String registryAddress, String registryLoadBalanceType, String registryType) {
 
         if (StringUtils.isNotEmpty(address)) {
             this.address = address;
@@ -91,23 +85,24 @@ public class BaseServer implements Server {
         this.reflectType = reflectType;
 
         // registry service
-        this.registryService = this.createRegistryService(registryAddress, registryType);
+        this.registryService = this.createRegistryService(registryAddress, registryType, registryLoadBalanceType);
     }
 
     /**
      * 创建服务注册与发现的实现类
      * @param registryAddress
      * @param registryType
+     * @param registryLoadBalanceType
      * @return
      */
-    private RegistryService createRegistryService(String registryAddress, String registryType) {
+    private RegistryService createRegistryService(String registryAddress, String registryType, String registryLoadBalanceType) {
 
         // TODO 后续扩展支持SPI
         RegistryService registryService = null;
 
         try {
             registryService = new ZookeeperRegistryService();
-            registryService.init(new RegistryConfig(registryAddress, registryType));
+            registryService.init(new RegistryConfig(registryAddress, registryType, registryLoadBalanceType));
         } catch (Exception e) {
 
             log.error("create registry service failed:", e);

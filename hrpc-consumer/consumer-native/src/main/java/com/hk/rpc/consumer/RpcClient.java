@@ -73,7 +73,7 @@ public class RpcClient {
 
 
     public RpcClient(String registryAddress, String registryType, String proxyType, String serviceVersion, String serviceGroup, long timeout,
-                     String serializationType, boolean async, boolean oneway) {
+                     String serializationType, String loadBalanceType, boolean async, boolean oneway) {
 
         this.proxyType = proxyType;
         this.serviceVersion = serviceVersion;
@@ -83,16 +83,17 @@ public class RpcClient {
         this.async = async;
         this.oneway = oneway;
 
-        this.registryService = this.createRegistryService(registryAddress, registryType);
+        this.registryService = this.createRegistryService(registryAddress, registryType, loadBalanceType);
     }
 
     /**
      * 创建服务注册与发现接口
      * @param registryAddress
      * @param registryType
+     * @param loadBalanceType
      * @return
      */
-    private RegistryService createRegistryService(String registryAddress, String registryType) {
+    private RegistryService createRegistryService(String registryAddress, String registryType, String loadBalanceType) {
 
         if (StringUtils.isEmpty(registryType)) {
             throw new IllegalArgumentException("Invalid registry type: " + registryType);
@@ -101,7 +102,7 @@ public class RpcClient {
         // TODO 后续SPI扩展
         RegistryService registryService  = new ZookeeperRegistryService();
         try{
-            registryService.init(new RegistryConfig(registryAddress, registryType));
+            registryService.init(new RegistryConfig(registryAddress, registryType, loadBalanceType));
         }catch(Exception e){
             log.error("rpc client init registry service throw exception: ", e);
             throw new RegistryException(e.getMessage(), e);

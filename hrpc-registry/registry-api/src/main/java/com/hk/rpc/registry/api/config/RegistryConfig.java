@@ -32,9 +32,15 @@ public class RegistryConfig implements Serializable {
      */
     private String registryType;
 
+    /**
+     * 负载均衡类型
+     */
+    private String registryLoadBalanceType;
 
-    public RegistryConfig(String registryAddress, String registryType) {
+
+    public RegistryConfig(String registryAddress, String registryType, String registryLoadBalanceType) {
         this.registryAddress = registryAddress;
         this.registryType = registryType;
+        this.registryLoadBalanceType = registryLoadBalanceType;
     }
 }

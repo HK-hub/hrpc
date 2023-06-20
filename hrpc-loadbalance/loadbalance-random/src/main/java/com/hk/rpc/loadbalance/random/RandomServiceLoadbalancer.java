@@ -1,6 +1,7 @@
 package com.hk.rpc.loadbalance.random;
 
 import com.hk.rpc.loadbalance.api.ServiceLoadbalancer;
+import com.hk.rpc.spi.annotation.SPIClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -18,6 +19,7 @@ import java.util.Random;
  * @Version : 1.0
  */
 @Slf4j
+@SPIClass
 public class RandomServiceLoadbalancer<T> implements ServiceLoadbalancer<T> {
 
     /**
