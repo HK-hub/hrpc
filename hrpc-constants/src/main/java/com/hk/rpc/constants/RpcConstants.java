@@ -159,6 +159,10 @@ public class RpcConstants {
      */
     public static final String SERVICE_LOAD_BALANCER_ROBIN_WEIGHT = "robinWeight";
 
+    /**
+     * 基于HASH算法的负载均衡
+     */
+    public static final String SERVICE_LOAD_BALANCER_HASH = "hash";
 
 
     public static void main(String[] args){
