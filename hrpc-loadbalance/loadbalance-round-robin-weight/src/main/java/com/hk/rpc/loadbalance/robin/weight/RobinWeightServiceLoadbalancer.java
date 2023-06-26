@@ -31,7 +31,7 @@ public class RobinWeightServiceLoadbalancer<T> implements ServiceLoadbalancer<T>
      * @return
      */
     @Override
-    public T select(List<T> servers, int hashCode) {
+    public T select(List<T> servers, int hashCode, String sourceIp) {
 
         log.debug("load balance by round robin weight...");
 

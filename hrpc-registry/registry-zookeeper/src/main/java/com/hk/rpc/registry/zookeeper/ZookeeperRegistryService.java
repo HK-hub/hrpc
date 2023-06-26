@@ -131,13 +131,13 @@ public class ZookeeperRegistryService implements RegistryService {
      * @throws Exception
      */
     @Override
-    public ServiceMeta discovery(String serviceName, int invokerHashCode) throws Exception {
+    public ServiceMeta discovery(String serviceName, int invokerHashCode, String sourceIp) throws Exception {
 
         // 获取服务集合
         Collection<ServiceInstance<ServiceMeta>> serviceInstances = this.serviceDiscovery.queryForInstances(serviceName);
 
         // 选择其中一个
-        ServiceInstance<ServiceMeta> instance = this.selectOneServiceInstance((List<ServiceInstance<ServiceMeta>>)serviceInstances, invokerHashCode);
+        ServiceInstance<ServiceMeta> instance = this.selectOneServiceInstance((List<ServiceInstance<ServiceMeta>>)serviceInstances, invokerHashCode, sourceIp);
 
         if (Objects.nonNull(instance)) {
             return instance.getPayload();
@@ -161,10 +161,10 @@ public class ZookeeperRegistryService implements RegistryService {
      * @param serviceInstances 服务实例集合
      * @return {@link ServiceInstance<ServiceMeta>}
      */
-    private ServiceInstance<ServiceMeta> selectOneServiceInstance(List<ServiceInstance<ServiceMeta>> serviceInstances, int hashCode) {
+    private ServiceInstance<ServiceMeta> selectOneServiceInstance(List<ServiceInstance<ServiceMeta>> serviceInstances, int hashCode, String sourceIp) {
 
         // 使用负载均衡器进行选择
-        return this.serviceLoadbalancer.select(serviceInstances, hashCode);
+        return this.serviceLoadbalancer.select(serviceInstances, hashCode, sourceIp);
     }
 
 

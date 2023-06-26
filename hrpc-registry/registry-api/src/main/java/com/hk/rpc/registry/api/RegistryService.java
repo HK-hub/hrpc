@@ -36,10 +36,11 @@ public interface RegistryService {
      * 服务发现
      * @param serviceName 服务名称
      * @param invokerHashCode HashCode 值
+     * @param sourceIp 源IP地址
      * @return {@link ServiceMeta} 服务元数据
      * @throws Exception
      */
-    public ServiceMeta discovery(String serviceName, int invokerHashCode) throws Exception;
+    public ServiceMeta discovery(String serviceName, int invokerHashCode, String sourceIp) throws Exception;
 
 
     /**

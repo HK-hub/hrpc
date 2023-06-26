@@ -29,7 +29,7 @@ public class RandomServiceLoadbalancer<T> implements ServiceLoadbalancer<T> {
      * @return
      */
     @Override
-    public T select(List<T> servers, int hashCode) {
+    public T select(List<T> servers, int hashCode, String sourceIp) {
 
         log.debug("select one server with random load balancer");
         if (CollectionUtils.isEmpty(servers)) {

@@ -52,6 +52,11 @@
             <artifactId>loadbalance-hash-weight</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>com.hk.rpc</groupId>
+            <artifactId>loadbalance-sourceip-hash</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>

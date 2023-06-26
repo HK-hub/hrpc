@@ -23,8 +23,9 @@ public interface ServiceLoadbalancer<T> {
      * 以负载均衡的方式选择一个节点
      * @param servers 服务列表
      * @param hashCode hash值
+     * @param sourceIp 源IP地址
      * @return 可用的服务节点
      */
-    T select(List<T> servers, int hashCode);
+    T select(List<T> servers, int hashCode, String sourceIp);
 
 }

@@ -1,6 +1,7 @@
 package com.hk.rpc.consumer.common;
 
 import com.hk.rpc.common.helper.RpcServiceHelper;
+import com.hk.rpc.common.ip.IpUtils;
 import com.hk.rpc.common.thread.ClientThreadPool;
 import com.hk.rpc.consumer.common.helper.RpcConsumerHandlerHelper;
 import com.hk.rpc.protocol.meta.ServiceMeta;
@@ -42,9 +43,16 @@ public class RpcConsumer implements Consumer {
 
     private static volatile RpcConsumer instance;
 
+    /**
+     * 本机IP地址
+     */
+    private final String localIp;
+
     public static Map<String, RpcConsumerHandler> handlerMap = new ConcurrentHashMap<>();
 
     private RpcConsumer() {
+
+        this.localIp = IpUtils.getLocalHostIp();
         this.bootstrap = new Bootstrap();
         this.eventLoopGroup = new NioEventLoopGroup();
         this.bootstrap.group(eventLoopGroup)
@@ -101,7 +109,7 @@ public class RpcConsumer implements Consumer {
         }
 
         // 服务发现: 负载均衡的进行服务发现
-        ServiceMeta serviceMeta = registryService.discovery(serviceKey, invokerHashCode);
+        ServiceMeta serviceMeta = registryService.discovery(serviceKey, invokerHashCode, this.localIp);
         if (Objects.nonNull(serviceMeta)) {
             RpcConsumerHandler handler = RpcConsumerHandlerHelper.get(serviceMeta);
             // 缓存中无 handler
