@@ -3,23 +3,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>hrpc</artifactId>
+        <artifactId>hrpc-loadbalance</artifactId>
         <groupId>com.hk.rpc</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>hrpc-loadbalance</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>loadbalance-api</module>
-        <module>loadbalance-random</module>
-        <module>loadbalance-random-weight</module>
-        <module>loadbalance-round-robin</module>
-        <module>loadbalance-round-robin-weight</module>
-        <module>loadbalance-hash</module>
-        <module>loadbalance-hash-weight</module>
-    </modules>
+    <artifactId>loadbalance-hash-weight</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -29,7 +19,7 @@
     <dependencies>
         <dependency>
             <groupId>com.hk.rpc</groupId>
-            <artifactId>hrpc-constants</artifactId>
+            <artifactId>loadbalance-api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
