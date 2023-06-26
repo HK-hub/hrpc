@@ -1,0 +1,1 @@
+randomWeight=com.hk.rpc.loadbalance.random.weight.RandomWeightServiceLoadBalancer

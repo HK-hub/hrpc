@@ -142,6 +142,13 @@ public class RpcConstants {
      */
     public static final String SERVICE_LOAD_BALANCER_RANDOM = "random";
 
+
+    /**
+     * 基于加权随机算法的负载均衡
+     */
+    public static final String SERVICE_LOAD_BALANCER_RANDOM_WEIGHT = "randomWeight";
+
+
     public static void main(String[] args){
         String str = "test0000000000000000";
         System.out.println(str.replace("0", ""));
