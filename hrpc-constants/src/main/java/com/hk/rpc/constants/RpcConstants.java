@@ -171,9 +171,14 @@ public class RpcConstants {
 
 
     /**
-     * 基于加权HASH算法的负载均衡
+     * 基于源IP地址Hash的负载均衡
      */
     public static final String SERVICE_LOAD_BALANCER_SOURCE_IP_HASH = "ipHash";
+
+    /**
+     * 基于源IP地址加权Hash的负载均衡
+     */
+    public static final String SERVICE_LOAD_BALANCER_SOURCE_IP_HASH_WEIGHT = "ipHashWeight";
 
     public static void main(String[] args){
         String str = "test0000000000000000";
