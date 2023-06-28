@@ -53,7 +53,7 @@ public class ZookeeperRegistryTest {
     public void testDiscovery() throws Exception {
 
         testRegister();
-        ServiceMeta discovery = this.registryService.discovery(ZookeeperRegistryTest.class.getName(), "hk".hashCode());
+        ServiceMeta discovery = this.registryService.discovery(ZookeeperRegistryTest.class.getName(), "hk".hashCode(), "127.0.0.1");
         log.info("discovery: {}", discovery);
     }
 

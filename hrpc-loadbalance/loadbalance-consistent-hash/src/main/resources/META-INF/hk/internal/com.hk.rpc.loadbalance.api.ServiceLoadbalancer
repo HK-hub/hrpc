@@ -1,0 +1,1 @@
+consistentHash=com.hk.rpc.loadbalance.consistent.hash.ConsistentHashServiceLoadbalancer

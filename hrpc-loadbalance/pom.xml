@@ -21,6 +21,7 @@
         <module>loadbalance-hash-weight</module>
         <module>loadbalance-sourceip-hash</module>
         <module>loadbalance-sourceip-hash-weight</module>
+        <module>loadbalance-consistent-hash</module>
     </modules>
 
     <properties>

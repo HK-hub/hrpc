@@ -180,6 +180,12 @@ public class RpcConstants {
      */
     public static final String SERVICE_LOAD_BALANCER_SOURCE_IP_HASH_WEIGHT = "ipHashWeight";
 
+    /**
+     * 基于一致性HASH的负载均衡策略
+     */
+    public static final String SERVICE_LOAD_BALANCER_CONSISTENT_HASH = "consistentHash";
+
+
     public static void main(String[] args){
         String str = "test0000000000000000";
         System.out.println(str.replace("0", ""));
