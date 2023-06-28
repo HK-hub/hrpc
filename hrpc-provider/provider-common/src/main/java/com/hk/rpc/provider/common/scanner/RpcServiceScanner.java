@@ -3,6 +3,7 @@ package com.hk.rpc.provider.common.scanner;
 import com.hk.rpc.annotation.RpcService;
 import com.hk.rpc.common.helper.RpcServiceHelper;
 import com.hk.rpc.common.scanner.ClassScanner;
+import com.hk.rpc.constants.RpcConstants;
 import com.hk.rpc.protocol.meta.ServiceMeta;
 import com.hk.rpc.registry.api.RegistryService;
 import lombok.extern.slf4j.Slf4j;
@@ -66,10 +67,11 @@ public class RpcServiceScanner extends ClassScanner {
                 String serviceName = getServiceName(annotation);
                 String version = annotation.version();
                 String group = annotation.group();
+                int weight = getServiceWeight(annotation.weight());
                 String key = RpcServiceHelper.locationService(serviceName, version, group);
 
                 // 创建 元数据
-                ServiceMeta serviceMeta = new ServiceMeta(serviceName, version, group, host, port);
+                ServiceMeta serviceMeta = new ServiceMeta(serviceName, version, group, host, port, weight);
                 // 将元数据注册到注册中心
                 registryService.register(serviceMeta);
 
@@ -119,6 +121,21 @@ public class RpcServiceScanner extends ClassScanner {
         return serviceName;
     }
 
+    /**
+     * 获取服务有效权重
+     * @param weight
+     * @return
+     */
+    private static int getServiceWeight(int weight) {
+        if (weight < RpcConstants.SERVICE_WEIGHT_MIN) {
+            weight = RpcConstants.SERVICE_WEIGHT_MIN;
+        }
 
+        if (weight > RpcConstants.SERVICE_WEIGHT_MAX) {
+            weight = RpcConstants.SERVICE_WEIGHT_MAX;
+        }
+
+        return weight;
+    }
 
 }

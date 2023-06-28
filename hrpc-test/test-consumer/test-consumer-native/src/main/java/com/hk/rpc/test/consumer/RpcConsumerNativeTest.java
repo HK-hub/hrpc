@@ -34,13 +34,12 @@ public class RpcConsumerNativeTest {
     @Before
     public void init() {
         rpcClient = new RpcClient(registryAddress, registryType, RpcConstants.PROXY_ASM, "1.0.0", "hk-hub",
-                3000, RpcConstants.SERIALIZATION_PROTOBUF, RpcConstants.SERVICE_LOAD_BALANCER_CONSISTENT_HASH, false, false);
+                3000, RpcConstants.SERIALIZATION_PROTOBUF, RpcConstants.SERVICE_ENHANCED_LOAD_BALANCER_PREFIX + RpcConstants.SERVICE_LOAD_BALANCER_RANDOM_WEIGHT, false, false);
     }
 
 
     @Test
     public void testSync() {
-
 
         // 获取代理对象
         DemoService demoService = rpcClient.create(DemoService.class);

@@ -2,7 +2,7 @@ package com.hk.rpc.test.scanner;
 
 import com.hk.rpc.common.scanner.ClassScanner;
 import com.hk.rpc.common.scanner.reference.RpcReferenceScanner;
-import com.hk.rpc.common.scanner.server.RpcServiceScanner;
+import com.hk.rpc.provider.common.scanner.RpcServiceScanner;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -41,7 +41,7 @@ public class ScannerTest {
     @Test
     public void testScannerClassNameListByRpcService() throws IOException {
 
-        RpcServiceScanner.doScannerWithRpcServiceAnnotationFilterAndRegistryService("",1,packageName);
+        RpcServiceScanner.doScannerWithRpcServiceAnnotationFilterAndRegistryService("",1, packageName, null);
     }
 
     /**

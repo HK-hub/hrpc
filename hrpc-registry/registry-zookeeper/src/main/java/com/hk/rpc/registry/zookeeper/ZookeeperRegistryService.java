@@ -1,7 +1,9 @@
 package com.hk.rpc.registry.zookeeper;
 
 import com.hk.rpc.common.helper.RpcServiceHelper;
+import com.hk.rpc.constants.RpcConstants;
 import com.hk.rpc.loadbalance.api.ServiceLoadbalancer;
+import com.hk.rpc.loadbalance.api.helper.ServiceLoadBalancerHelper;
 import com.hk.rpc.protocol.meta.ServiceMeta;
 import com.hk.rpc.registry.api.RegistryService;
 import com.hk.rpc.registry.api.config.RegistryConfig;
@@ -54,9 +56,14 @@ public class ZookeeperRegistryService implements RegistryService {
     private ServiceDiscovery<ServiceMeta> serviceDiscovery;
 
     /**
-     * 复制均衡器
+     * 负载均衡器
      */
     private ServiceLoadbalancer<ServiceInstance<ServiceMeta>> serviceLoadbalancer;
+
+    /**
+     * 增强型负载均衡器
+     */
+    private ServiceLoadbalancer<ServiceMeta> enhancedServiceLoadBalancer;
 
 
     /**
@@ -77,7 +84,13 @@ public class ZookeeperRegistryService implements RegistryService {
                 .build();
 
         // 负载均衡器
-        this.serviceLoadbalancer = ExtensionLoader.getExtension(ServiceLoadbalancer.class, registryConfig.getRegistryLoadBalanceType());
+        String loadBalancerType = registryConfig.getRegistryLoadBalanceType();
+        if (loadBalancerType.toLowerCase().startsWith(RpcConstants.SERVICE_ENHANCED_LOAD_BALANCER_PREFIX)) {
+            // 使用增强型负载均衡器
+            this.enhancedServiceLoadBalancer = ExtensionLoader.getExtension(ServiceLoadbalancer.class, loadBalancerType);
+        } else {
+            this.serviceLoadbalancer = ExtensionLoader.getExtension(ServiceLoadbalancer.class, loadBalancerType);
+        }
         // 启动服务发现注册
         this.serviceDiscovery.start();
     }
@@ -135,6 +148,41 @@ public class ZookeeperRegistryService implements RegistryService {
 
         // 获取服务集合
         Collection<ServiceInstance<ServiceMeta>> serviceInstances = this.serviceDiscovery.queryForInstances(serviceName);
+
+        // 采用负载均衡器进行选择其中一个服务
+        if (Objects.nonNull(this.serviceLoadbalancer)) {
+            // 普通负载均衡
+            return this.getServiceMetaInstance(invokerHashCode, sourceIp, serviceInstances);
+        }
+
+        // 采用增强型
+        return this.getServiceMetaInstanceByEnhanced(serviceInstances, invokerHashCode, sourceIp);
+    }
+
+    /**
+     * 增强型负载均衡
+     * @param serviceInstances
+     * @param invokerHashCode
+     * @param sourceIp
+     * @return
+     */
+    private ServiceMeta getServiceMetaInstanceByEnhanced(Collection<ServiceInstance<ServiceMeta>> serviceInstances, int invokerHashCode, String sourceIp) {
+
+        List<ServiceMeta> serviceMetaList = ServiceLoadBalancerHelper.getServiceMetaList((List<ServiceInstance<ServiceMeta>>) serviceInstances);
+
+        return this.enhancedServiceLoadBalancer.select(serviceMetaList, invokerHashCode, sourceIp);
+    }
+
+
+    /**
+     * 普通型负载均衡器进行选择
+     * @param invokerHashCode
+     * @param sourceIp
+     * @param serviceInstances
+     * @return
+     * @throws Exception
+     */
+    private ServiceMeta getServiceMetaInstance(int invokerHashCode, String sourceIp, Collection<ServiceInstance<ServiceMeta>> serviceInstances) throws Exception {
 
         // 选择其中一个
         ServiceInstance<ServiceMeta> instance = this.selectOneServiceInstance((List<ServiceInstance<ServiceMeta>>)serviceInstances, invokerHashCode, sourceIp);

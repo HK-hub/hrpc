@@ -53,4 +53,10 @@ public class ServiceMeta implements Serializable {
      */
     private int port;
 
+
+    /**
+     * 服务提供者实例权重
+     */
+    private int weight;
+
 }

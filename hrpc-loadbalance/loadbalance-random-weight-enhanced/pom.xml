@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>loadbalance-consistent-hash</artifactId>
+    <artifactId>loadbalance-random-weight-enhanced</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -17,21 +17,6 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.apache.curator</groupId>
-            <artifactId>curator-framework</artifactId>
-            <version>${curator.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.curator</groupId>
-            <artifactId>curator-recipes</artifactId>
-            <version>${curator.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.curator</groupId>
-            <artifactId>curator-x-discovery</artifactId>
-            <version>${curator.version}</version>
-        </dependency>
         <dependency>
             <groupId>com.hk.rpc</groupId>
             <artifactId>loadbalance-api</artifactId>

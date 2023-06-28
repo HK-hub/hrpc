@@ -43,4 +43,9 @@ public @interface RpcService {
      */
     String group() default "";
 
+    /**
+     * 服务实例权重
+     */
+    int weight() default 1;
+
 }
