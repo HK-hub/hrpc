@@ -1,1 +1,1 @@
-robinWeight=com.hk.rpc.loadbalance.robin.weight.RobinWeightServiceLoadbalancer
+enhanced_robinWeight=com.hk.rpc.loadbalance.enhanced.robin.weight.RobinWeightEnhancedServiceLoadBalancer
