@@ -36,7 +36,7 @@ public class RpcConsumerNativeTest {
         rpcClient = new RpcClient(registryAddress, registryType, RpcConstants.PROXY_ASM, "1.0.0", "hk-hub",
                 3000,
                 RpcConstants.SERIALIZATION_PROTOBUF, RpcConstants.SERVICE_ENHANCED_LOAD_BALANCER_PREFIX +
-                RpcConstants.SERVICE_LOAD_BALANCER_ROBIN_WEIGHT,
+                RpcConstants.SERVICE_LOAD_BALANCER_HASH_WEIGHT,
                 false, false);
     }
 

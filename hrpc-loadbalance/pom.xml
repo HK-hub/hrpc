@@ -24,6 +24,7 @@
         <module>loadbalance-consistent-hash</module>
         <module>loadbalance-random-weight-enhanced</module>
         <module>loadbalance-round-robin-weight-enhanced</module>
+        <module>loadbalance-hash-weight-enhanced</module>
     </modules>
 
     <properties>
