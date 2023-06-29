@@ -26,6 +26,7 @@
         <module>loadbalance-round-robin-weight-enhanced</module>
         <module>loadbalance-hash-weight-enhanced</module>
         <module>loadbalance-sourceip-hash-weight-enhanced</module>
+        <module>loadbalance-consistent-hash-enhanced</module>
     </modules>
 
     <properties>
