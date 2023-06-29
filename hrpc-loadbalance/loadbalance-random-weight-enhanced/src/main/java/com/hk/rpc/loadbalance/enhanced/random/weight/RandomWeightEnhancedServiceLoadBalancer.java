@@ -1,4 +1,4 @@
-package com.hk.rpc.loadbalance.random.weight.enhanced;
+package com.hk.rpc.loadbalance.enhanced.random.weight;
 
 import com.hk.rpc.loadbalance.api.base.BaseEnhancedServiceLoadBalancer;
 import com.hk.rpc.protocol.meta.ServiceMeta;

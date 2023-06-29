@@ -1,1 +1,1 @@
-enhanced_randomWeight=com.hk.rpc.loadbalance.random.weight.enhanced.RandomWeightEnhancedServiceLoadBalancer
+enhanced_randomWeight=com.hk.rpc.loadbalance.enhanced.random.weight.RandomWeightEnhancedServiceLoadBalancer
