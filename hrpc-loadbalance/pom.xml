@@ -25,6 +25,7 @@
         <module>loadbalance-random-weight-enhanced</module>
         <module>loadbalance-round-robin-weight-enhanced</module>
         <module>loadbalance-hash-weight-enhanced</module>
+        <module>loadbalance-sourceip-hash-weight-enhanced</module>
     </modules>
 
     <properties>

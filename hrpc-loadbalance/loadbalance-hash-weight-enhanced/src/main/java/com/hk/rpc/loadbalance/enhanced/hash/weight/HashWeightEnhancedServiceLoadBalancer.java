@@ -1,4 +1,4 @@
-package com.hk.rpc.loadbalance.enhanced.robin.weight;
+package com.hk.rpc.loadbalance.enhanced.hash.weight;
 
 import com.hk.rpc.loadbalance.api.base.BaseEnhancedServiceLoadBalancer;
 import com.hk.rpc.protocol.meta.ServiceMeta;

@@ -1,1 +1,1 @@
-enhanced_hashWeight=com.hk.rpc.loadbalance.enhanced.robin.weight.HashWeightEnhancedServiceLoadBalancer
+enhanced_hashWeight=com.hk.rpc.loadbalance.enhanced.hash.weight.HashWeightEnhancedServiceLoadBalancer
