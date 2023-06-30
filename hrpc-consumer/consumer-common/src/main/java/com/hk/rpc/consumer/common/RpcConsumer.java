@@ -124,7 +124,12 @@ public class RpcConsumer implements Consumer {
                 RpcConsumerHandlerHelper.put(serviceMeta, handler);
             }
 
-            return handler.sendRequest(protocol, request.isAsync(), request.isOneway());
+            // 发送请求
+            RPCFuture future = handler.sendRequest(protocol, request.isAsync(), request.isOneway());
+
+            // 断开链接，关闭连接数负载
+            ConnectionsContext.remove(serviceMeta);
+            return future;
         }
 
         return null;

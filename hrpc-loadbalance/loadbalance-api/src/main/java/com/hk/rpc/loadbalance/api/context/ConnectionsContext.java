@@ -1,6 +1,7 @@
 package com.hk.rpc.loadbalance.api.context;
 
 import com.hk.rpc.protocol.meta.ServiceMeta;
+import org.apache.commons.lang3.BooleanUtils;
 
 import java.util.Map;
 import java.util.Objects;
@@ -43,6 +44,25 @@ public class ConnectionsContext {
 
     private static String generateKey(ServiceMeta serviceMeta) {
         return serviceMeta.getServiceAddress().concat(":").concat(String.valueOf(serviceMeta.getPort()));
+    }
+
+
+    /**
+     * 移除连接数
+     * @param serviceMeta
+     */
+    public static void remove(ServiceMeta serviceMeta) {
+
+        String key = generateKey(serviceMeta);
+        if (BooleanUtils.isFalse(connectionMap.containsKey(key))) {
+            // 不包含
+            return;
+        }
+
+        // 获取连接数
+        Integer connections = connectionMap.get(key);
+        // 释放连接数
+        connectionMap.put(key, Math.max(connections - 1, 0));
     }
 
 }
