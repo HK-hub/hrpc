@@ -39,7 +39,7 @@ public class ZookeeperRegistryTest {
         registryService.init(registryConfig);
 
         this.serviceMeta = new ServiceMeta(ZookeeperRegistryTest.class.getName(), "1.0.0", "hk",
-                "127.0.0.1", 8080);
+                "127.0.0.1", 8080, 10);
     }
 
 

@@ -100,7 +100,7 @@ public class RpcClient {
         }
 
         // TODO 后续SPI扩展
-        RegistryService registryService  = new ZookeeperRegistryService();
+        RegistryService registryService  = ExtensionLoader.getExtension(RegistryService.class, registryType);
         try{
             registryService.init(new RegistryConfig(registryAddress, registryType, loadBalanceType));
         }catch(Exception e){

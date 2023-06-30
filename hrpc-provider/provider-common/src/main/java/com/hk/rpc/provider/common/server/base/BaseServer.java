@@ -7,6 +7,7 @@ import com.hk.rpc.provider.common.server.api.Server;
 import com.hk.rpc.registry.api.RegistryService;
 import com.hk.rpc.registry.api.config.RegistryConfig;
 import com.hk.rpc.registry.zookeeper.ZookeeperRegistryService;
+import com.hk.rpc.spi.loader.ExtensionLoader;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -101,7 +102,7 @@ public class BaseServer implements Server {
         RegistryService registryService = null;
 
         try {
-            registryService = new ZookeeperRegistryService();
+            registryService = ExtensionLoader.getExtension(RegistryService.class, registryType);
             registryService.init(new RegistryConfig(registryAddress, registryType, registryLoadBalanceType));
         } catch (Exception e) {
 

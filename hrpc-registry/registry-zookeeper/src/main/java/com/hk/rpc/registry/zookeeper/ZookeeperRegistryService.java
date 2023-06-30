@@ -7,7 +7,9 @@ import com.hk.rpc.loadbalance.api.helper.ServiceLoadBalancerHelper;
 import com.hk.rpc.protocol.meta.ServiceMeta;
 import com.hk.rpc.registry.api.RegistryService;
 import com.hk.rpc.registry.api.config.RegistryConfig;
+import com.hk.rpc.spi.annotation.SPIClass;
 import com.hk.rpc.spi.loader.ExtensionLoader;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
@@ -32,6 +34,8 @@ import java.util.Objects;
  * @Modified :
  * @Version : 1.0
  */
+@Slf4j
+@SPIClass
 public class ZookeeperRegistryService implements RegistryService {
 
     /**
