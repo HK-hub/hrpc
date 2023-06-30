@@ -185,6 +185,11 @@ public class RpcConstants {
      */
     public static final String SERVICE_LOAD_BALANCER_CONSISTENT_HASH = "consistentHash";
 
+    /**
+     * 最小连接数负载均衡
+     */
+    public static final String SERVICE_LOAD_BALANCER_LEAST_CONNECTIONS = "leastConnections";
+
 
     /**
      * 增强型负载均衡前缀
