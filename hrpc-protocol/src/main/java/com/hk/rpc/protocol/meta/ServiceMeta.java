@@ -3,6 +3,7 @@ package com.hk.rpc.protocol.meta;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 import java.io.Serializable;
 
@@ -17,6 +18,7 @@ import java.io.Serializable;
  * @Version : 1.0
  */
 @Data
+@ToString
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
