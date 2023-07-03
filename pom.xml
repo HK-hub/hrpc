@@ -38,6 +38,7 @@
         <protostuff.version>1.0.8</protostuff.version>
         <zookeeper.version>3.5.5</zookeeper.version>
         <etcd.version>0.7.5</etcd.version>
+        <nacos.version>2.2.3</nacos.version>
         <curator.version>2.12.0</curator.version>
         <commons.collections4.version>4.0</commons.collections4.version>
         <commons.lang3.version>3.12.0</commons.lang3.version>

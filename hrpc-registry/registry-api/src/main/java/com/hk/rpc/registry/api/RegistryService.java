@@ -49,7 +49,7 @@ public interface RegistryService {
      * 服务销毁
      * @throws IOException 抛出异常
      */
-    public void destroy() throws IOException;
+    public void destroy() throws IOException, NacosException;
 
 
 
