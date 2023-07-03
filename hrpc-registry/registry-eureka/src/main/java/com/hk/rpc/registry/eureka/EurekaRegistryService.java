@@ -4,6 +4,7 @@ import com.hk.rpc.protocol.meta.ServiceMeta;
 import com.hk.rpc.registry.api.RegistryService;
 import com.hk.rpc.registry.api.config.RegistryConfig;
 import com.hk.rpc.spi.annotation.SPIClass;
+import com.netflix.discovery.shared.transport.EurekaHttpClient;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -22,10 +23,13 @@ import java.io.IOException;
 @SPIClass
 public class EurekaRegistryService implements RegistryService {
 
+    private EurekaHttpClient client;
 
     @Override
     public void init(RegistryConfig registryConfig) throws Exception {
-        RegistryService.super.init(registryConfig);
+
+
+
     }
 
     @Override

@@ -1,1 +1,1 @@
-eureka=com.hk.rpc.registry.etcd.EtcdRegistryService
+eureka=com.hk.rpc.registry.eureka.EurekaRegistryService
