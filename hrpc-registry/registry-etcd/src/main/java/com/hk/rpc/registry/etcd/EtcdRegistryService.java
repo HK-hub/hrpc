@@ -86,7 +86,7 @@ public class EtcdRegistryService implements RegistryService {
     public void register(ServiceMeta serviceMeta) throws Exception {
 
         // 租约
-        long leaseId = System.currentTimeMillis();
+        long leaseId = 0;
 
         try {
             // 租约
@@ -135,13 +135,16 @@ public class EtcdRegistryService implements RegistryService {
      */
     private String buildServiceKey(ServiceMeta serviceMeta) {
 
-        // base_dir + group + service + version
+        // base_dir + group + service + version + host + ":" + port
         StringJoiner joiner = new StringJoiner("/");
 
         String location = RpcServiceHelper.locationService(serviceMeta.getServiceName(), serviceMeta.getServiceVersion(), serviceMeta.getServiceGroup());
 
         return joiner.add(ETCD_REGISTRY_DIR)
                 .add(location)
+                .add(serviceMeta.getServiceAddress())
+                .add(":")
+                .add(String.valueOf(serviceMeta.getPort()))
                 .toString();
     }
 
