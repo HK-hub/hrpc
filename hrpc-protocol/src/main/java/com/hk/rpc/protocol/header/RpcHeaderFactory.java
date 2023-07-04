@@ -36,4 +36,23 @@ public class RpcHeaderFactory {
     }
 
 
+    /**
+     * 指定消息类型，序列化类型
+     * @param serialization
+     * @param type 消息类型
+     * @return
+     */
+    public static RpcHeader getRequestHeader(String serialization, int type) {
+
+        RpcHeader rpcHeader = new RpcHeader();
+
+        // 设置请求id
+        long requestId = IdFactory.getId();
+        rpcHeader.setMagic(RpcConstants.MAGIC)
+                .setRequestId(requestId)
+                .setMsgType((byte) type)
+                .setStatus((byte) 0x1)
+                .setSerializationType(serialization);
+        return rpcHeader;
+    }
 }

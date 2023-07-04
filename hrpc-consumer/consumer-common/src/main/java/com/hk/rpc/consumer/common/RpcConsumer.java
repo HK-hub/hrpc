@@ -4,6 +4,7 @@ import com.hk.rpc.common.helper.RpcServiceHelper;
 import com.hk.rpc.common.ip.IpUtils;
 import com.hk.rpc.common.thread.ClientThreadPool;
 import com.hk.rpc.consumer.common.helper.RpcConsumerHandlerHelper;
+import com.hk.rpc.consumer.common.manager.ConsumerConnectionManager;
 import com.hk.rpc.loadbalance.api.context.ConnectionsContext;
 import com.hk.rpc.protocol.meta.ServiceMeta;
 import com.hk.rpc.proxy.api.consumer.Consumer;
@@ -24,6 +25,9 @@ import org.apache.commons.lang3.BooleanUtils;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author : HK意境
@@ -42,6 +46,12 @@ public class RpcConsumer implements Consumer {
 
     private final EventLoopGroup eventLoopGroup;
 
+    /**
+     * 定时任务线程池
+     */
+    private ScheduledExecutorService executorService;
+
+
     private static volatile RpcConsumer instance;
 
     /**
@@ -49,9 +59,26 @@ public class RpcConsumer implements Consumer {
      */
     private final String localIp;
 
+    /**
+     * 心跳时间间隔: 默认30s
+     */
+    private int heartbeatInterval = 30000;
+
+    /**
+     * 扫描channel 通道活跃性时间间隔：默认60s
+     */
+    private int scanInactiveInterval = 60000;
+
     public static Map<String, RpcConsumerHandler> handlerMap = new ConcurrentHashMap<>();
 
-    private RpcConsumer() {
+
+
+    /**
+     * 设置心跳间隔时间，连接活跃扫描时间
+     * @param heartbeatInterval
+     * @param scanInactiveInterval
+     */
+    private RpcConsumer(int heartbeatInterval, int scanInactiveInterval) {
 
         this.localIp = IpUtils.getLocalHostIp();
         this.bootstrap = new Bootstrap();
@@ -59,19 +86,29 @@ public class RpcConsumer implements Consumer {
         this.bootstrap.group(eventLoopGroup)
                 .channel(NioSocketChannel.class)
                 .handler(new RpcConsumerInitializer());
+        // 开始心跳检测
+        if (heartbeatInterval > 0) {
+            this.heartbeatInterval = heartbeatInterval;
+        }
+        if (scanInactiveInterval > 0) {
+            this.scanInactiveInterval = scanInactiveInterval;
+        }
+
+        this.startHeartbeat();
     }
+
 
 
     /**
      * 双检查单例
      * @return RpcConsumer
      */
-    public static RpcConsumer getInstance() {
+    public static RpcConsumer getInstance(int heartbeatInterval, int scanInactiveInterval) {
 
         if (instance == null) {
             synchronized (RpcConsumer.class) {
                 if (instance == null) {
-                    instance = new RpcConsumer();
+                    instance = new RpcConsumer(heartbeatInterval, scanInactiveInterval);
                 }
             }
         }
@@ -162,6 +199,25 @@ public class RpcConsumer implements Consumer {
 
         return channelFuture.channel().pipeline().get(RpcConsumerHandler.class);
     }
+
+
+    /**
+     * 开始心跳检测
+     */
+    private void startHeartbeat() {
+
+        executorService = Executors.newScheduledThreadPool(2);
+
+        // 扫描并处理所有不活跃的连接: 每隔60 秒扫描一次
+        executorService.scheduleAtFixedRate(ConsumerConnectionManager::scanInactiveChannel,
+                10, this.scanInactiveInterval, TimeUnit.SECONDS);
+
+        // 发送心跳消息: 30 秒进行一次心跳扫描
+        executorService.scheduleAtFixedRate(ConsumerConnectionManager::broadcastPingMessageFromConsumer,
+                3, this.heartbeatInterval, TimeUnit.SECONDS);
+
+    }
+
 
 
 

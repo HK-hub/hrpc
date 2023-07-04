@@ -92,8 +92,8 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
         // 解析消息类型
         RpcHeader header = protocol.getHeader();
 
-        byte msgType = header.getMsgType();
-        if (Objects.equals(msgType, RpcType.HEARTBEAT.getType())) {
+        int msgType = header.getMsgType();
+        if (Objects.equals(msgType, RpcType.HEARTBEAT_FROM_CONSUMER.getType())) {
             // 心跳消息
             response = this.handleHeartbeatMessage(protocol, header);
         } else if (Objects.equals(msgType, RpcType.REQUEST.getType())) {

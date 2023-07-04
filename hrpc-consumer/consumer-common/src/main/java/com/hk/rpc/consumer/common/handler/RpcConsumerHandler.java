@@ -3,6 +3,7 @@ package com.hk.rpc.consumer.common.handler;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.hk.rpc.constants.RpcConstants;
+import com.hk.rpc.consumer.common.cache.ConsumerChannelCache;
 import com.hk.rpc.consumer.common.context.RpcContext;
 import com.hk.rpc.protocol.enumeration.RpcType;
 import com.hk.rpc.proxy.api.future.RPCFuture;
@@ -73,6 +74,7 @@ public class RpcConsumerHandler extends SimpleChannelInboundHandler<RpcProtocol<
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
         this.remotePeer = this.channel.remoteAddress();
+        ConsumerChannelCache.addChannel(this.channel);
     }
 
 
@@ -133,7 +135,7 @@ public class RpcConsumerHandler extends SimpleChannelInboundHandler<RpcProtocol<
      */
     private void handleHeartbeatMessage(RpcProtocol<RpcResponse> protocol) {
 
-        log.debug("rpc consumer receive heartbeat message:{}",protocol.toString());
+        log.debug("rpc consumer receive provider={} heartbeat message:{}", this.channel.remoteAddress(), protocol.getBody().getResult());
     }
 
 
