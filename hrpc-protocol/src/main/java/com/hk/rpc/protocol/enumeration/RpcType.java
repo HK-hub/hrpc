@@ -25,6 +25,14 @@ public enum RpcType {
     RESPONSE(2, RpcResponse.class),
     // 心跳消息
     HEARTBEAT(3),
+    // 从服务消费者发起心跳数据
+    HEARTBEAT_FROM_CONSUMER(4),
+    // 服务提供者响应服务消费者心跳数据
+    HEARTBEAT_TO_CONSUMER(5),
+    // 从服务提供者发起心跳数据
+    HEARTBEAT_FROM_PROVIDER(6),
+    // 服务消费者响应服务提供者心跳数据
+    HEARTBEAT_TO_PROVIDER(7),
     // 控制消息
     CONTROL(4),
     ;

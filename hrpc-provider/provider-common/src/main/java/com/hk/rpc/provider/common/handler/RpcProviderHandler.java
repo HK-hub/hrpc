@@ -155,7 +155,7 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
 
         log.debug("RPC Server handle Heartbeat:{}", protocol.toString());
 
-        header.setMsgType((byte) RpcType.HEARTBEAT.getType());
+        header.setMsgType((byte) RpcType.HEARTBEAT_TO_CONSUMER.getType());
         RpcRequest heartbeat = protocol.getBody();
 
         // 构造响应 心跳消息

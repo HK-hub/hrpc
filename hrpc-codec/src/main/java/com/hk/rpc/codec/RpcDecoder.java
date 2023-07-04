@@ -81,6 +81,7 @@ public class RpcDecoder extends ByteToMessageDecoder implements RpcCodec{
         // 2.反序列化出消息体
         Serialization serialization = this.getSerialization(serializationType);
         switch (rpcType) {
+            // 请求消息
             case REQUEST:
                 RpcRequest rpcRequest = serialization.deserialize(data, RpcRequest.class);
                 if (Objects.nonNull(rpcRequest)) {
@@ -89,6 +90,12 @@ public class RpcDecoder extends ByteToMessageDecoder implements RpcCodec{
                             .setBody(rpcRequest);
                     out.add(rpcProtocol);
                 }
+                break;
+            // 服务提供者ping 消息
+            case HEARTBEAT_FROM_PROVIDER:
+                break;
+            // 服务消费者ping消息
+            case HEARTBEAT_FROM_CONSUMER:
                 break;
             case RESPONSE:
                 RpcResponse response = serialization.deserialize(data, RpcResponse.class);
@@ -99,6 +106,12 @@ public class RpcDecoder extends ByteToMessageDecoder implements RpcCodec{
                     out.add(protocol);
                 }
             break;
+            // 服务提供者pong消息
+            case HEARTBEAT_TO_CONSUMER:
+                break;
+            // 服务消费者pong消息
+            case HEARTBEAT_TO_PROVIDER:
+                break;
             case HEARTBEAT:
                 // TODO 心跳消息
                 break;
