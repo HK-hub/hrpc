@@ -141,7 +141,7 @@ public class NacosRegistryService implements RegistryService {
 
         try {
             this.namingService.shutDown();
-        } catch (NacosException e) {
+        } catch (Exception e) {
             log.error("shutdown service instance error:", e);
         }
     }

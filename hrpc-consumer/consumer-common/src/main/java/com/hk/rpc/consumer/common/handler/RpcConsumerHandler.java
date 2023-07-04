@@ -2,7 +2,9 @@ package com.hk.rpc.consumer.common.handler;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.hk.rpc.constants.RpcConstants;
 import com.hk.rpc.consumer.common.context.RpcContext;
+import com.hk.rpc.protocol.enumeration.RpcType;
 import com.hk.rpc.proxy.api.future.RPCFuture;
 import com.hk.rpc.protocol.RpcProtocol;
 import com.hk.rpc.protocol.header.RpcHeader;
@@ -88,6 +90,32 @@ public class RpcConsumerHandler extends SimpleChannelInboundHandler<RpcProtocol<
         }
 
         log.info("服务消费者收到的数据>>>{}", JSON.toJSONString(protocol));
+        this.handleMessage(protocol);
+    }
+
+
+    /**
+     * 处理接收到的消息
+     * @param protocol
+     */
+    private void handleMessage(RpcProtocol<RpcResponse> protocol) {
+
+        RpcHeader header = protocol.getHeader();
+        if (Objects.equals(header.getMsgType(), RpcType.HEARTBEAT.getType())) {
+            // 心跳消息
+            this.handleHeartbeatMessage(protocol);
+        } else if (Objects.equals(header.getMsgType(), RpcType.RESPONSE.getType())) {
+            // 响应消息
+            this.handleResponseMessage(protocol);
+        }
+    }
+
+
+    /**
+     * 处理请求消息
+     * @param protocol
+     */
+    private void handleResponseMessage(RpcProtocol<RpcResponse> protocol) {
 
         // 解析响应协议数据
         RpcHeader header = protocol.getHeader();
@@ -96,6 +124,16 @@ public class RpcConsumerHandler extends SimpleChannelInboundHandler<RpcProtocol<
         if (Objects.nonNull(rpcFuture)) {
             rpcFuture.done(protocol);
         }
+    }
+
+
+    /**
+     * 处理心跳消息
+     * @param protocol
+     */
+    private void handleHeartbeatMessage(RpcProtocol<RpcResponse> protocol) {
+
+        log.debug("rpc consumer receive heartbeat message:{}",protocol.toString());
     }
 
 
