@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.hk.rpc.constants.RpcConstants;
 import com.hk.rpc.consumer.common.cache.ConsumerChannelCache;
 import com.hk.rpc.consumer.common.context.RpcContext;
+import com.hk.rpc.protocol.enumeration.RpcStatus;
 import com.hk.rpc.protocol.enumeration.RpcType;
 import com.hk.rpc.proxy.api.future.RPCFuture;
 import com.hk.rpc.protocol.RpcProtocol;
@@ -92,7 +93,7 @@ public class RpcConsumerHandler extends SimpleChannelInboundHandler<RpcProtocol<
         }
 
         log.info("服务消费者收到的数据>>>{}", JSON.toJSONString(protocol));
-        this.handleMessage(protocol);
+        this.handleMessage(protocol, ctx.channel());
     }
 
 
@@ -100,13 +101,17 @@ public class RpcConsumerHandler extends SimpleChannelInboundHandler<RpcProtocol<
      * 处理接收到的消息
      * @param protocol
      */
-    private void handleMessage(RpcProtocol<RpcResponse> protocol) {
+    private void handleMessage(RpcProtocol<RpcResponse> protocol, Channel channel) {
 
         RpcHeader header = protocol.getHeader();
-        if (Objects.equals(header.getMsgType(), RpcType.HEARTBEAT_TO_CONSUMER.getType())) {
-            // 心跳消息
+        int msgType = header.getMsgType();
+        if (Objects.equals(msgType, RpcType.HEARTBEAT_TO_CONSUMER.getType())) {
+            // 心跳消息: pong
             this.handleHeartbeatMessage(protocol);
-        } else if (Objects.equals(header.getMsgType(), RpcType.RESPONSE.getType())) {
+        } else if (Objects.equals(msgType, RpcType.HEARTBEAT_FROM_PROVIDER)) {
+            // 心跳消息: ping
+            this.handleHeartbeatMessageFromProvider(protocol, channel);
+        } else if (Objects.equals(msgType, RpcType.RESPONSE.getType())) {
             // 响应消息
             this.handleResponseMessage(protocol);
         }
@@ -136,6 +141,28 @@ public class RpcConsumerHandler extends SimpleChannelInboundHandler<RpcProtocol<
     private void handleHeartbeatMessage(RpcProtocol<RpcResponse> protocol) {
 
         log.debug("rpc consumer receive provider={} heartbeat message:{}", this.channel.remoteAddress(), protocol.getBody().getResult());
+    }
+
+
+    /**
+     * 处理 pong 消息
+     * 接收服务提供者发过来的ping 消息，并且响应pong消息
+     * @param protocol
+     * @param channel
+     */
+    private void handleHeartbeatMessageFromProvider(RpcProtocol<RpcResponse> protocol, Channel channel) {
+
+        RpcHeader header = protocol.getHeader();
+        header.setMsgType((byte) RpcType.HEARTBEAT_TO_PROVIDER.getType());
+
+        // 发送 ping 消息
+        RpcProtocol<RpcRequest> requestRpcProtocol = new RpcProtocol<>();
+        RpcRequest request = new RpcRequest();
+        request.setParameters(new Object[]{RpcConstants.HEARTBEAT_PONG});
+        header.setStatus((byte) RpcStatus.SUCCESS.getCode());
+
+        requestRpcProtocol.setHeader(header).setBody(request);
+        channel.writeAndFlush(requestRpcProtocol);
     }
 
 

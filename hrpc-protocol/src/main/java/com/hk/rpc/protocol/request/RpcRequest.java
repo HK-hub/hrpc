@@ -2,6 +2,7 @@ package com.hk.rpc.protocol.request;
 
 import com.hk.rpc.protocol.base.RpcMessage;
 import lombok.Data;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 /**
@@ -15,6 +16,7 @@ import lombok.experimental.Accessors;
  * @Version : 1.0
  */
 @Data
+@ToString
 @Accessors(chain = true)
 public class RpcRequest extends RpcMessage {
 

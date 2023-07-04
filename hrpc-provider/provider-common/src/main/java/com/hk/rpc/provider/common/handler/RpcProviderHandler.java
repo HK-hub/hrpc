@@ -10,12 +10,10 @@ import com.hk.rpc.protocol.enumeration.RpcType;
 import com.hk.rpc.protocol.header.RpcHeader;
 import com.hk.rpc.protocol.request.RpcRequest;
 import com.hk.rpc.protocol.response.RpcResponse;
+import com.hk.rpc.provider.common.cache.ProviderChannelCache;
 import com.hk.rpc.reflect.api.ReflectInvoker;
 import com.hk.rpc.spi.loader.ExtensionLoader;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.*;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.cglib.reflect.FastClass;
 import net.sf.cglib.reflect.FastMethod;
@@ -53,10 +51,30 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
     }
 
 
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        super.channelActive(ctx);
+        ProviderChannelCache.addChannel(ctx.channel());
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        ProviderChannelCache.removeChannel(ctx.channel());
+    }
+
+    @Override
+    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
+        super.channelUnregistered(ctx);
+        ProviderChannelCache.removeChannel(ctx.channel());
+    }
+
+
     /**
      * 接收到消息
+     *
      * @param ctx
      * @param protocol
+     *
      * @throws Exception
      */
     @Override
@@ -66,26 +84,24 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
         log.info("handlerMap中存放的数据如下==>>>{}", handlerMap.toString());
 
         ServerThreadPool.submit(() -> {
-            RpcProtocol<RpcResponse> responseRpcProtocol = this.handleMessage(protocol);
+            RpcProtocol<RpcResponse> responseRpcProtocol = this.handleMessage(protocol, ctx.channel());
 
             // 直接返回数据
             ctx.writeAndFlush(responseRpcProtocol)
-                    .addListener(new ChannelFutureListener() {
-                        @Override
-                        public void operationComplete(ChannelFuture channelFuture) throws Exception {
-                            log.debug("Send response for request:{}", protocol.getHeader().getRequestId());
-                        }
-                    });
+                    .addListener((ChannelFutureListener) channelFuture ->
+                            log.debug("Send response for request:{}", protocol.getHeader().getRequestId()));
         });
 
     }
 
     /**
      * 处理消息分发
+     *
      * @param protocol
+     *
      * @return
      */
-    private RpcProtocol<RpcResponse> handleMessage(RpcProtocol<RpcRequest> protocol) {
+    private RpcProtocol<RpcResponse> handleMessage(RpcProtocol<RpcRequest> protocol, Channel channel) {
 
         RpcProtocol<RpcResponse> response = null;
 
@@ -94,8 +110,11 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
 
         int msgType = header.getMsgType();
         if (Objects.equals(msgType, RpcType.HEARTBEAT_FROM_CONSUMER.getType())) {
-            // 心跳消息
+            // 心跳消息：ping
             response = this.handleHeartbeatMessage(protocol, header);
+        } else if (Objects.equals(msgType, RpcType.HEARTBEAT_TO_PROVIDER.getType())) {
+            // 心跳消息: pong
+            this.handleHeartbeatMessageToProvider(protocol, channel);
         } else if (Objects.equals(msgType, RpcType.REQUEST.getType())) {
             // 请求消息
             response = this.handleRequestMessage(protocol, header);
@@ -107,8 +126,10 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
 
     /**
      * 处理请求消息
+     *
      * @param protocol
      * @param header
+     *
      * @return
      */
     private RpcProtocol<RpcResponse> handleRequestMessage(RpcProtocol<RpcRequest> protocol, RpcHeader header) {
@@ -147,8 +168,10 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
 
     /**
      * 处理心跳消息
+     *
      * @param protocol
      * @param header
+     *
      * @return
      */
     private RpcProtocol<RpcResponse> handleHeartbeatMessage(RpcProtocol<RpcRequest> protocol, RpcHeader header) {
@@ -171,10 +194,23 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
     }
 
 
+    /**
+     * 处理服务消费者响应给服务提供者的心跳数据
+     *
+     * @param protocol
+     * @param channel
+     */
+    public void handleHeartbeatMessageToProvider(RpcProtocol<RpcRequest> protocol, Channel channel) {
+
+        log.debug("receive service consumer={}, heartbeat message={}", channel.remoteAddress(), protocol.getBody().toString());
+    }
+
 
     /**
      * 处理 RPC 调用请求，执行调用目标方法
+     *
      * @param request
+     *
      * @return 调用结果返回值 或错误
      */
     private Object handle(RpcRequest request) throws Exception {
@@ -208,11 +244,13 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
 
     /**
      * 调用目标方法
-     * @param serviceBean 服务Bean
-     * @param serviceClass 服务类
-     * @param methodName 目标方法
+     *
+     * @param serviceBean    服务Bean
+     * @param serviceClass   服务类
+     * @param methodName     目标方法
      * @param parameterTypes 方法参数类型集合
-     * @param parameters 方法参数集合
+     * @param parameters     方法参数集合
+     *
      * @return Object result 反射调用方法的结果
      */
     private Object invokeMethod(Object serviceBean, Class<?> serviceClass, String methodName, Class<?>[] parameterTypes, Object[] parameters) throws Exception {
@@ -229,11 +267,13 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
 
     /**
      * cglib 调用方法
-     * @param serviceBean 服务Bean
-     * @param serviceClass 服务类
-     * @param methodName 目标方法
+     *
+     * @param serviceBean    服务Bean
+     * @param serviceClass   服务类
+     * @param methodName     目标方法
      * @param parameterTypes 方法参数类型集合
-     * @param parameters 方法参数集合
+     * @param parameters     方法参数集合
+     *
      * @return Object result 反射调用方法的结果
      */
     private Object invokeMethodByCglib(Object serviceBean, Class<?> serviceClass, String methodName, Class<?>[] parameterTypes, Object[] parameters) throws Exception {
@@ -250,13 +290,16 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
 
     /**
      * Channel 通道出现 异常处理
+     *
      * @param ctx
      * @param cause
+     *
      * @throws Exception
      */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         log.error("server caught exception", cause);
+        ProviderChannelCache.removeChannel(ctx.channel());
         ctx.close();
     }
 

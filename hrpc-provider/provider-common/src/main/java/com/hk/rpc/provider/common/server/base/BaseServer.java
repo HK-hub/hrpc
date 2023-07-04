@@ -3,6 +3,7 @@ package com.hk.rpc.provider.common.server.base;
 import com.hk.rpc.codec.RpcDecoder;
 import com.hk.rpc.codec.RpcEncoder;
 import com.hk.rpc.provider.common.handler.RpcProviderHandler;
+import com.hk.rpc.provider.common.manager.ProviderConnectionManager;
 import com.hk.rpc.provider.common.server.api.Server;
 import com.hk.rpc.registry.api.RegistryService;
 import com.hk.rpc.registry.api.config.RegistryConfig;
@@ -24,6 +25,9 @@ import org.apache.commons.lang3.StringUtils;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author : HK意境
@@ -50,7 +54,6 @@ public class BaseServer implements Server {
      */
     protected int port = 27110;
 
-
     /**
      * 服务注册中心
      */
@@ -61,11 +64,15 @@ public class BaseServer implements Server {
      */
     protected Map<String, Object> handlerMap = new HashMap<>();
 
-
     /**
      * 调用方法反射类型
      */
     protected String reflectType;
+
+    /**
+     * 心跳定时任务线程池
+     */
+    protected ScheduledExecutorService executorService;
 
     /**
      * 指定地址，端口
@@ -146,6 +153,8 @@ public class BaseServer implements Server {
             ChannelFuture future = serverBootstrap.bind(new InetSocketAddress(this.address, this.port))
                     .sync();
             log.info("Server started on-->>> {}:{}",this.address, this.port);
+            // 开始心跳
+            this.startHeartbeat();
             future.channel().closeFuture().sync();
 
         }catch(Exception e){
@@ -158,4 +167,20 @@ public class BaseServer implements Server {
         }
 
     }
+
+    /**
+     * 开始心跳检测定时任务
+     */
+    public void startHeartbeat() {
+
+        this.executorService = Executors.newScheduledThreadPool(2);
+
+        this.executorService.scheduleAtFixedRate(() -> ProviderConnectionManager.broadcastPingMessageFromProvider(),
+                3, 30000, TimeUnit.MILLISECONDS);
+
+        this.executorService.scheduleAtFixedRate(() -> ProviderConnectionManager.scanInactiveChannel(),
+                10, 60000,  TimeUnit.MILLISECONDS);
+    }
+
+
 }

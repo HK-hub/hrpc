@@ -210,11 +210,11 @@ public class RpcConsumer implements Consumer {
 
         // 扫描并处理所有不活跃的连接: 每隔60 秒扫描一次
         executorService.scheduleAtFixedRate(ConsumerConnectionManager::scanInactiveChannel,
-                10, this.scanInactiveInterval, TimeUnit.SECONDS);
+                10, this.scanInactiveInterval, TimeUnit.MILLISECONDS);
 
         // 发送心跳消息: 30 秒进行一次心跳扫描
         executorService.scheduleAtFixedRate(ConsumerConnectionManager::broadcastPingMessageFromConsumer,
-                3, this.heartbeatInterval, TimeUnit.SECONDS);
+                3, this.heartbeatInterval, TimeUnit.MILLISECONDS);
 
     }
 
