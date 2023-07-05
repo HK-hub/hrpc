@@ -5,6 +5,7 @@ import com.hk.rpc.protocol.request.RpcRequest;
 import com.hk.rpc.protocol.response.RpcResponse;
 import lombok.Data;
 import lombok.Getter;
+import lombok.ToString;
 
 /**
  * @author : HK意境
@@ -17,6 +18,7 @@ import lombok.Getter;
  * @Version : 1.0
  */
 @Getter
+@ToString
 public enum RpcType {
 
     // 请求消息
@@ -63,6 +65,16 @@ public enum RpcType {
             }
         }
         return null;
+    }
+
+    public static boolean isRequestFullType(RpcType type) {
+
+        return REQUEST.equals(type) || HEARTBEAT_FROM_CONSUMER.equals(type) || HEARTBEAT_TO_PROVIDER.equals(type);
+    }
+
+    public static boolean isResponseFullType(RpcType type) {
+
+        return RESPONSE.equals(type) || HEARTBEAT_TO_CONSUMER.equals(type) || HEARTBEAT_FROM_PROVIDER.equals(type);
     }
 
 }

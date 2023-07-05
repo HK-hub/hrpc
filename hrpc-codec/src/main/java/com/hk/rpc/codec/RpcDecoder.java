@@ -11,6 +11,7 @@ import com.hk.rpc.serialization.api.Serialization;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.Objects;
  * @Modified :
  * @Version : 1.0
  */
+@Slf4j
 public class RpcDecoder extends ByteToMessageDecoder implements RpcCodec{
 
 
@@ -80,43 +82,51 @@ public class RpcDecoder extends ByteToMessageDecoder implements RpcCodec{
                 .setMsgLength(bodyLength);
         // 2.反序列化出消息体
         Serialization serialization = this.getSerialization(serializationType);
-        switch (rpcType) {
-            // 请求消息
-            case REQUEST:
-                RpcRequest rpcRequest = serialization.deserialize(data, RpcRequest.class);
-                if (Objects.nonNull(rpcRequest)) {
-                    RpcProtocol<RpcRequest> rpcProtocol = new RpcProtocol<>();
-                    rpcProtocol.setHeader(header)
-                            .setBody(rpcRequest);
-                    out.add(rpcProtocol);
-                }
-                break;
-            // 服务提供者ping 消息
-            case HEARTBEAT_FROM_PROVIDER:
-                break;
-            // 服务消费者ping消息
-            case HEARTBEAT_FROM_CONSUMER:
-                break;
-            case RESPONSE:
-                RpcResponse response = serialization.deserialize(data, RpcResponse.class);
-                if (response != null) {
-                    RpcProtocol<RpcResponse> protocol = new RpcProtocol<>();
-                    protocol.setHeader(header);
-                    protocol.setBody(response);
-                    out.add(protocol);
-                }
-            break;
-            // 服务提供者pong消息
-            case HEARTBEAT_TO_CONSUMER:
-                break;
-            // 服务消费者pong消息
-            case HEARTBEAT_TO_PROVIDER:
-                break;
-            case HEARTBEAT:
-                // TODO 心跳消息
-                break;
+
+        // 判断消息类型
+        log.debug("message type is {}", rpcType.toString());
+        if (RpcType.isRequestFullType(rpcType)) {
+            RpcProtocol<RpcRequest> protocol = this.handleRequestFulMessage(serialization, data, header);
+            out.add(protocol);
+        } else if (RpcType.isResponseFullType(rpcType)) {
+            RpcProtocol<RpcResponse> protocol = this.handleResponseFulMessage(serialization, data, header);
+            out.add(protocol);
+        }
+    }
+
+
+    /**
+     * 处理request类型的消息数据：REQUEST， PING消息
+     * @param data
+     */
+    public RpcProtocol<RpcRequest> handleRequestFulMessage(Serialization serialization, byte[] data, RpcHeader header) {
+
+        RpcRequest rpcRequest = serialization.deserialize(data, RpcRequest.class);
+        log.debug("rpc request message is {}", rpcRequest);
+        if (Objects.nonNull(rpcRequest)) {
+            RpcProtocol<RpcRequest> rpcProtocol = new RpcProtocol<>();
+            rpcProtocol.setHeader(header).setBody(rpcRequest);
+            return rpcProtocol;
         }
 
-
+        return null;
     }
+
+    /**
+     * 处理request类型的消息数据：RESPONSE， PONG消息
+     * @param data
+     */
+    public RpcProtocol<RpcResponse> handleResponseFulMessage(Serialization serialization, byte[] data, RpcHeader header) {
+
+        RpcResponse response = serialization.deserialize(data, RpcResponse.class);
+        log.debug("rpc response message is {}", response);
+        if (response != null) {
+            RpcProtocol<RpcResponse> protocol = new RpcProtocol<>();
+            protocol.setHeader(header).setBody(response);
+            return protocol;
+        }
+
+        return null;
+    }
+
 }

@@ -106,10 +106,10 @@ public class RpcConsumerHandler extends SimpleChannelInboundHandler<RpcProtocol<
         RpcHeader header = protocol.getHeader();
         int msgType = header.getMsgType();
         if (Objects.equals(msgType, RpcType.HEARTBEAT_TO_CONSUMER.getType())) {
-            // 心跳消息: pong
+            // 服务提供者响应给服务消费者的心跳消息: pong
             this.handleHeartbeatMessage(protocol);
-        } else if (Objects.equals(msgType, RpcType.HEARTBEAT_FROM_PROVIDER)) {
-            // 心跳消息: ping
+        } else if (Objects.equals(msgType, RpcType.HEARTBEAT_FROM_PROVIDER.getType())) {
+            // 服务消费者发送给服务提供者的心跳消息: ping
             this.handleHeartbeatMessageFromProvider(protocol, channel);
         } else if (Objects.equals(msgType, RpcType.RESPONSE.getType())) {
             // 响应消息

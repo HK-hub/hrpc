@@ -27,8 +27,8 @@ public class RpcSingleServer extends BaseServer {
      * @param registryType
      */
     public RpcSingleServer(String host, int port, String scanPackage, String reflectType, String loadBalanceType,
-                           String registryAddress, String registryType) {
-        super(host, port, reflectType, registryAddress, loadBalanceType, registryType);
+                           String registryAddress, String registryType, int heartbeatInterval, int scanInactiveInterval) {
+        super(host, port, reflectType, registryAddress, loadBalanceType, registryType, heartbeatInterval, scanInactiveInterval);
 
         // 获取 @RpcService 注解标注的类映射信息
         try {

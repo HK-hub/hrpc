@@ -75,11 +75,27 @@ public class BaseServer implements Server {
     protected ScheduledExecutorService executorService;
 
     /**
+     * 心跳间隔时间：30s
+     */
+    protected int heartbeatInterval = 30000;
+
+    /**
+     * 扫描不活跃连接间隔时间：60s
+     */
+    protected int scanInactiveInterval = 60000;
+
+
+
+    
+    
+    
+    /**
      * 指定地址，端口
      * @param address
      * @param port
      */
-    public BaseServer(String address, int port, String reflectType, String registryAddress, String registryLoadBalanceType, String registryType) {
+    public BaseServer(String address, int port, String reflectType, String registryAddress, String registryLoadBalanceType,
+                      String registryType, int heartbeatInterval, int scanInactiveInterval) {
 
         if (StringUtils.isNotEmpty(address)) {
             this.address = address;
@@ -91,6 +107,15 @@ public class BaseServer implements Server {
         }
 
         this.reflectType = reflectType;
+
+        // 心跳配置时间
+        if (heartbeatInterval > 0) {
+            this.heartbeatInterval = heartbeatInterval;
+        }
+
+        if (scanInactiveInterval > 0) {
+            this.scanInactiveInterval = scanInactiveInterval;
+        }
 
         // registry service
         this.registryService = this.createRegistryService(registryAddress, registryType, registryLoadBalanceType);
@@ -175,11 +200,11 @@ public class BaseServer implements Server {
 
         this.executorService = Executors.newScheduledThreadPool(2);
 
-        this.executorService.scheduleAtFixedRate(() -> ProviderConnectionManager.broadcastPingMessageFromProvider(),
-                3, 30000, TimeUnit.MILLISECONDS);
+        this.executorService.scheduleAtFixedRate(ProviderConnectionManager::broadcastPingMessageFromProvider,
+                3, this.heartbeatInterval, TimeUnit.MILLISECONDS);
 
-        this.executorService.scheduleAtFixedRate(() -> ProviderConnectionManager.scanInactiveChannel(),
-                10, 60000,  TimeUnit.MILLISECONDS);
+        this.executorService.scheduleAtFixedRate(ProviderConnectionManager::scanInactiveChannel,
+                10, this.scanInactiveInterval,  TimeUnit.MILLISECONDS);
     }
 
 

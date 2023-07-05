@@ -6,6 +6,7 @@ import com.hk.rpc.protocol.enumeration.RpcType;
 import com.hk.rpc.protocol.header.RpcHeader;
 import com.hk.rpc.protocol.header.RpcHeaderFactory;
 import com.hk.rpc.protocol.request.RpcRequest;
+import com.hk.rpc.protocol.response.RpcResponse;
 import com.hk.rpc.provider.common.cache.ProviderChannelCache;
 import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
@@ -60,11 +61,11 @@ public class ProviderConnectionManager {
         }
 
         // 构建心跳消息
-        RpcProtocol<RpcRequest> rpcProtocol = new RpcProtocol<>();
-        RpcRequest request = new RpcRequest();
+        RpcProtocol<RpcResponse> rpcProtocol = new RpcProtocol<>();
+        RpcResponse response = new RpcResponse();
         RpcHeader header = RpcHeaderFactory.getRequestHeader(RpcConstants.SERIALIZATION_PROTOBUF, RpcType.HEARTBEAT_FROM_PROVIDER.getType());
-        request.setParameters(new Object[]{RpcConstants.HEARTBEAT_PING});
-        rpcProtocol.setHeader(header).setBody(request);
+        response.setResult(RpcConstants.HEARTBEAT_PING);
+        rpcProtocol.setHeader(header).setBody(response);
 
         // 广播发送心跳消息
         for (Channel channel : channelCache) {

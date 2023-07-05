@@ -34,9 +34,9 @@ public class RpcConsumerNativeTest {
     @Before
     public void init() {
         rpcClient = new RpcClient(registryAddress, registryType, RpcConstants.PROXY_JAVASSIST, "1.0.0", "hk-hub",
-                3000,
-                RpcConstants.SERIALIZATION_PROTOBUF, RpcConstants.SERVICE_LOAD_BALANCER_RANDOM,
-                10, 20, false, false);
+                30000,
+                RpcConstants.SERIALIZATION_KRYO, RpcConstants.SERVICE_LOAD_BALANCER_RANDOM,
+                10000, 20000, false, false);
     }
 
 

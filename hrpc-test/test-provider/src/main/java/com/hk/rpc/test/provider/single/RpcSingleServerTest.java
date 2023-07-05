@@ -21,7 +21,7 @@ public class RpcSingleServerTest {
 
         RpcSingleServer singleServer = new RpcSingleServer("127.0.0.1", 27880, "com.hk.rpc.test.provider",
                 RpcConstants.REFLECT_TYPE_JAVASSIST, RpcConstants.SERVICE_LOAD_BALANCER_RANDOM,
-                "47.108.146.141:2181", "zookeeper");
+                "47.108.146.141:2181", "zookeeper", 10000, 30000);
         singleServer.start();
     }
 

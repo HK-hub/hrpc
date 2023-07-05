@@ -2,6 +2,7 @@ package com.hk.rpc.protocol;
 
 import com.hk.rpc.protocol.header.RpcHeader;
 import lombok.Data;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
@@ -17,6 +18,7 @@ import java.io.Serializable;
  * @Version : 1.0
  */
 @Data
+@ToString
 @Accessors(chain = true)
 public class RpcProtocol<T> implements Serializable {
 

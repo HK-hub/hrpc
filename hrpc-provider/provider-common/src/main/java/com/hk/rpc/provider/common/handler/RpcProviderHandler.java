@@ -89,7 +89,7 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
             // 直接返回数据
             ctx.writeAndFlush(responseRpcProtocol)
                     .addListener((ChannelFutureListener) channelFuture ->
-                            log.debug("Send response for request:{}", protocol.getHeader().getRequestId()));
+                            log.debug("Send response={} for request:{}", responseRpcProtocol, protocol.getHeader().getRequestId()));
         });
 
     }
@@ -120,6 +120,7 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
             response = this.handleRequestMessage(protocol, header);
         }
 
+        log.debug("rpc provider handle request={}, and response={}", protocol, response);
         return response;
     }
 
@@ -134,6 +135,7 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
      */
     private RpcProtocol<RpcResponse> handleRequestMessage(RpcProtocol<RpcRequest> protocol, RpcHeader header) {
 
+        header.setMsgType((byte) RpcType.RESPONSE.getType());
         RpcRequest request = protocol.getBody();
         // 构造响应消息数据
         RpcProtocol<RpcResponse> responseRpcProtocol = new RpcProtocol<>();

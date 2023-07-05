@@ -63,7 +63,8 @@ public class ConsumerConnectionManager {
         // 构建心跳消息
         RpcProtocol<RpcRequest> rpcProtocol = new RpcProtocol<>();
         RpcRequest request = new RpcRequest();
-        RpcHeader header = RpcHeaderFactory.getRequestHeader(RpcConstants.SERIALIZATION_PROTOBUF, RpcType.HEARTBEAT_FROM_CONSUMER.getType());
+        RpcHeader header = RpcHeaderFactory.getRequestHeader(RpcConstants.SERIALIZATION_PROTOBUF,
+                RpcType.HEARTBEAT_FROM_CONSUMER.getType());
         request.setParameters(new Object[]{RpcConstants.HEARTBEAT_PING});
         rpcProtocol.setHeader(header).setBody(request);
 
