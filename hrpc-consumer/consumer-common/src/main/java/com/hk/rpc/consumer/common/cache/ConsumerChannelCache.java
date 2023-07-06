@@ -1,5 +1,6 @@
 package com.hk.rpc.consumer.common.cache;
 
+import com.hk.rpc.consumer.common.manager.ConsumerConnectionManager;
 import io.netty.channel.Channel;
 
 import java.util.Set;
@@ -20,11 +21,16 @@ public class ConsumerChannelCache {
     private static volatile Set<Channel> channelCache = new CopyOnWriteArraySet<>();
 
     public static void addChannel(Channel channel) {
+
         channelCache.add(channel);
+        ConsumerConnectionManager.HEARTBEAT_CHECK_CONTAINER.put(channel.id().asLongText(),
+                new ConsumerConnectionManager.HeartbeatCheckContainer(channel));
     }
 
     public static void removeChannel(Channel channel) {
+
         channelCache.remove(channel);
+        ConsumerConnectionManager.HEARTBEAT_CHECK_CONTAINER.remove(channel.id().asLongText());
     }
 
     public static Set<Channel> getChannelCache() {

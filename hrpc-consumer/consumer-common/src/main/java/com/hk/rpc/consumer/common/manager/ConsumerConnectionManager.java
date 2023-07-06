@@ -8,11 +8,18 @@ import com.hk.rpc.protocol.header.RpcHeader;
 import com.hk.rpc.protocol.header.RpcHeaderFactory;
 import com.hk.rpc.protocol.request.RpcRequest;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
-
+import java.net.SocketAddress;
+import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author : HK意境
@@ -26,6 +33,11 @@ import java.util.Set;
  */
 @Slf4j
 public class ConsumerConnectionManager {
+
+    /**
+     * 心跳检测计数器
+     */
+    public static final Map<String, HeartbeatCheckContainer> HEARTBEAT_CHECK_CONTAINER = new ConcurrentHashMap<>();
 
 
     /**
@@ -73,9 +85,84 @@ public class ConsumerConnectionManager {
             if (BooleanUtils.isTrue(channel.isOpen()) && BooleanUtils.isTrue(channel.isActive())) {
                 // 活跃连接
                 log.debug("consumer={} send heartbeat={} message to provider={}", channel.localAddress(), RpcConstants.HEARTBEAT_PING, channel.remoteAddress());
+
+                // 发送心跳
                 channel.writeAndFlush(rpcProtocol);
+                // 计数
+                increaseMissHeartbeatCounter(channel.id().asLongText());
             }
         }
+    }
+
+
+    /**
+     * 消费者重连服务提供者
+     */
+    public static void reconnectProvider() {
+
+        Collection<HeartbeatCheckContainer> containers = HEARTBEAT_CHECK_CONTAINER.values();
+
+        for (HeartbeatCheckContainer container : containers) {
+            AtomicInteger missCounter = container.getMissCounter();
+            Channel channel = container.getChannel();
+            if (missCounter.get() >= 3 && channel.isActive() && channel.isOpen()) {
+                // 连续失联达到三次, 执行重连
+                SocketAddress socketAddress = channel.remoteAddress();
+                ChannelFuture future = channel.connect(socketAddress);
+                container.setChannel(future.channel());
+            }
+        }
+    }
+
+
+
+    /**
+     * 清除连续没有响应的计数
+     * @param id
+     */
+    public static void cleanMissHeartbeatCounter(String id) {
+
+        HeartbeatCheckContainer container = HEARTBEAT_CHECK_CONTAINER.get(id);
+        container.getMissCounter().set(0);
+    }
+
+
+    /**
+     * 增加一次失联计数
+     * @param id
+     * @return
+     */
+    public static int increaseMissHeartbeatCounter(String id) {
+
+        HeartbeatCheckContainer container = HEARTBEAT_CHECK_CONTAINER.get(id);
+        int counter = container.getMissCounter().incrementAndGet();
+
+        return counter;
+    }
+
+
+
+    @Getter
+    @Setter
+    public static class HeartbeatCheckContainer {
+
+        /**
+         * channel id
+         */
+        private String id;
+
+        private Channel channel;
+
+        /**
+         * 失联次数统计：连续失联3次则进行重连或断开连接
+         */
+        private AtomicInteger missCounter = new AtomicInteger(0);
+
+        public HeartbeatCheckContainer(Channel channel) {
+            this.channel = channel;
+            this.id = channel.id().asLongText();
+        }
+
     }
 
 }

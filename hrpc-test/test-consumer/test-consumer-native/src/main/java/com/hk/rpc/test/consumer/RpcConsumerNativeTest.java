@@ -36,12 +36,12 @@ public class RpcConsumerNativeTest {
         rpcClient = new RpcClient(registryAddress, registryType, RpcConstants.PROXY_JAVASSIST, "1.0.0", "hk-hub",
                 30000,
                 RpcConstants.SERIALIZATION_KRYO, RpcConstants.SERVICE_LOAD_BALANCER_RANDOM,
-                10000, 20000, false, false);
+                3000, 5000, false, false);
     }
 
 
     @Test
-    public void testSync() {
+    public void testSync() throws InterruptedException {
 
         // 获取代理对象
         DemoService demoService = rpcClient.create(DemoService.class);
@@ -50,7 +50,7 @@ public class RpcConsumerNativeTest {
         String res = demoService.hello("测试服务消费者整合动态代理直接调用服务获取返回数据结果!!!");
 
         log.info("rpc call result={}", res);
-        rpcClient.shutdown();
+        // rpcClient.shutdown();
     }
 
 

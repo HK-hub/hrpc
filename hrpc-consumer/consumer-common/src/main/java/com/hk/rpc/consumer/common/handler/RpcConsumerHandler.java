@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.hk.rpc.constants.RpcConstants;
 import com.hk.rpc.consumer.common.cache.ConsumerChannelCache;
 import com.hk.rpc.consumer.common.context.RpcContext;
+import com.hk.rpc.consumer.common.manager.ConsumerConnectionManager;
 import com.hk.rpc.protocol.enumeration.RpcStatus;
 import com.hk.rpc.protocol.enumeration.RpcType;
 import com.hk.rpc.proxy.api.future.RPCFuture;
@@ -135,17 +136,19 @@ public class RpcConsumerHandler extends SimpleChannelInboundHandler<RpcProtocol<
 
 
     /**
-     * 处理心跳消息
+     * 处理心跳 pong 消息
      * @param protocol
      */
     private void handleHeartbeatMessage(RpcProtocol<RpcResponse> protocol) {
 
         log.debug("rpc consumer receive provider={} heartbeat message:{}", this.channel.remoteAddress(), protocol.getBody().getResult());
+        // 清除失联计数
+        ConsumerConnectionManager.cleanMissHeartbeatCounter(this.channel.id().asLongText());
     }
 
 
     /**
-     * 处理 pong 消息
+     * 处理 ping 消息
      * 接收服务提供者发过来的ping 消息，并且响应pong消息
      * @param protocol
      * @param channel

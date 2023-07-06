@@ -216,6 +216,9 @@ public class RpcConsumer implements Consumer {
         executorService.scheduleAtFixedRate(ConsumerConnectionManager::broadcastPingMessageFromConsumer,
                 3, this.heartbeatInterval, TimeUnit.MILLISECONDS);
 
+        // 执行重连
+        executorService.scheduleAtFixedRate(ConsumerConnectionManager::reconnectProvider, 3, 3, TimeUnit.SECONDS);
+
     }
 
 
