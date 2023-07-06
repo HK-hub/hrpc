@@ -11,6 +11,7 @@ import com.hk.rpc.protocol.header.RpcHeader;
 import com.hk.rpc.protocol.request.RpcRequest;
 import com.hk.rpc.protocol.response.RpcResponse;
 import com.hk.rpc.provider.common.cache.ProviderChannelCache;
+import com.hk.rpc.provider.common.manager.ProviderConnectionManager;
 import com.hk.rpc.reflect.api.ReflectInvoker;
 import com.hk.rpc.spi.loader.ExtensionLoader;
 import io.netty.channel.*;
@@ -205,6 +206,8 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
     public void handleHeartbeatMessageToProvider(RpcProtocol<RpcRequest> protocol, Channel channel) {
 
         log.debug("receive service consumer={}, heartbeat message={}", channel.remoteAddress(), protocol.getBody().toString());
+        // 清除失联计数
+        ProviderConnectionManager.cleanMissHeartbeatCounter(channel.id().asLongText());
     }
 
 

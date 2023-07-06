@@ -85,10 +85,6 @@ public class BaseServer implements Server {
     protected int scanInactiveInterval = 60000;
 
 
-
-    
-    
-    
     /**
      * 指定地址，端口
      * @param address
@@ -198,13 +194,16 @@ public class BaseServer implements Server {
      */
     public void startHeartbeat() {
 
-        this.executorService = Executors.newScheduledThreadPool(2);
+        this.executorService = Executors.newScheduledThreadPool(3);
 
         this.executorService.scheduleAtFixedRate(ProviderConnectionManager::broadcastPingMessageFromProvider,
                 3, this.heartbeatInterval, TimeUnit.MILLISECONDS);
 
         this.executorService.scheduleAtFixedRate(ProviderConnectionManager::scanInactiveChannel,
                 10, this.scanInactiveInterval,  TimeUnit.MILLISECONDS);
+
+        this.executorService.scheduleAtFixedRate(ProviderConnectionManager::disconnectProvider,
+                3, 5, TimeUnit.SECONDS);
     }
 
 

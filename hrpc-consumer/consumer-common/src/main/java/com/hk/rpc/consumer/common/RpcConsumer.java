@@ -206,7 +206,7 @@ public class RpcConsumer implements Consumer {
      */
     private void startHeartbeat() {
 
-        executorService = Executors.newScheduledThreadPool(2);
+        executorService = Executors.newScheduledThreadPool(3);
 
         // 扫描并处理所有不活跃的连接: 每隔60 秒扫描一次
         executorService.scheduleAtFixedRate(ConsumerConnectionManager::scanInactiveChannel,
