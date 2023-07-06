@@ -2,6 +2,7 @@ package com.hk.rpc.provider.common.server.base;
 
 import com.hk.rpc.codec.RpcDecoder;
 import com.hk.rpc.codec.RpcEncoder;
+import com.hk.rpc.constants.RpcConstants;
 import com.hk.rpc.provider.common.handler.RpcProviderHandler;
 import com.hk.rpc.provider.common.manager.ProviderConnectionManager;
 import com.hk.rpc.provider.common.server.api.Server;
@@ -17,6 +18,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -161,8 +163,11 @@ public class BaseServer implements Server {
                         protected void initChannel(SocketChannel channel) {
                             channel.pipeline()
                                     // TODO 预留编解码，需要实现自定义协议
-                                    .addLast(new RpcDecoder())
-                                    .addLast(new RpcEncoder())
+                                    .addLast(RpcConstants.CODEC_DECODER, new RpcDecoder())
+                                    .addLast(RpcConstants.CODEC_ENCODER, new RpcEncoder())
+                                    // 心跳handler
+                                    .addLast(RpcConstants.CODEC_SERVER_IDLE_HANDLER,
+                                            new IdleStateHandler(0, 0, heartbeatInterval, TimeUnit.MILLISECONDS))
                                     .addLast(new RpcProviderHandler(reflectType, handlerMap));
                         }
                     })

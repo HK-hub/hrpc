@@ -14,7 +14,9 @@ import com.hk.rpc.provider.common.cache.ProviderChannelCache;
 import com.hk.rpc.provider.common.manager.ProviderConnectionManager;
 import com.hk.rpc.reflect.api.ReflectInvoker;
 import com.hk.rpc.spi.loader.ExtensionLoader;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
+import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.cglib.reflect.FastClass;
 import net.sf.cglib.reflect.FastMethod;
@@ -309,4 +311,26 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
     }
 
 
+    /**
+     * 心跳事件发生
+     * @param ctx
+     * @param evt
+     * @throws Exception
+     */
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+
+        // 如果是 IdleStateEvent
+        if (evt instanceof IdleStateEvent) {
+            Channel channel = ctx.channel();
+            try {
+                log.debug("triggered idle state event, close the channel={}", channel);
+                channel.close();
+            } finally {
+                channel.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
+            }
+        }
+
+        super.userEventTriggered(ctx, evt);
+    }
 }
