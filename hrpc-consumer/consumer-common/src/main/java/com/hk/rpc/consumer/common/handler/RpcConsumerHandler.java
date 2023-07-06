@@ -8,6 +8,7 @@ import com.hk.rpc.consumer.common.context.RpcContext;
 import com.hk.rpc.consumer.common.manager.ConsumerConnectionManager;
 import com.hk.rpc.protocol.enumeration.RpcStatus;
 import com.hk.rpc.protocol.enumeration.RpcType;
+import com.hk.rpc.protocol.header.RpcHeaderFactory;
 import com.hk.rpc.proxy.api.future.RPCFuture;
 import com.hk.rpc.protocol.RpcProtocol;
 import com.hk.rpc.protocol.header.RpcHeader;
@@ -18,6 +19,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.timeout.IdleStateEvent;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -258,4 +260,27 @@ public class RpcConsumerHandler extends SimpleChannelInboundHandler<RpcProtocol<
     }
 
 
+    /**
+     * 读超时事件
+     * @param ctx
+     * @param evt
+     * @throws Exception
+     */
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+
+        if (evt instanceof IdleStateEvent) {
+
+            // 发送一次心跳数据
+            RpcHeader header = RpcHeaderFactory.getRequestHeader(RpcConstants.SERIALIZATION_PROTOBUF, RpcType.HEARTBEAT_FROM_CONSUMER.getType());
+            RpcProtocol<RpcRequest> requestRpcProtocol = new RpcProtocol<>();
+            RpcRequest request = new RpcRequest();
+            request.setParameters(new Object[]{RpcConstants.HEARTBEAT_PING});
+            requestRpcProtocol.setHeader(header).setBody(request);
+
+            ctx.channel().writeAndFlush(requestRpcProtocol);
+        } else {
+            super.userEventTriggered(ctx, evt);
+        }
+    }
 }

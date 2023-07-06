@@ -273,29 +273,6 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
 
 
     /**
-     * cglib 调用方法
-     *
-     * @param serviceBean    服务Bean
-     * @param serviceClass   服务类
-     * @param methodName     目标方法
-     * @param parameterTypes 方法参数类型集合
-     * @param parameters     方法参数集合
-     *
-     * @return Object result 反射调用方法的结果
-     */
-    private Object invokeMethodByCglib(Object serviceBean, Class<?> serviceClass, String methodName, Class<?>[] parameterTypes, Object[] parameters) throws Exception {
-        log.info("use cglib reflect type invoke method...");
-
-        // 获取方法
-        FastClass serviceFastClass = FastClass.create(serviceClass);
-        FastMethod method = serviceFastClass.getMethod(methodName, parameterTypes);
-
-        // 执行方法
-        return method.invoke(serviceBean, parameters);
-    }
-
-
-    /**
      * Channel 通道出现 异常处理
      *
      * @param ctx
