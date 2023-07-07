@@ -30,6 +30,7 @@ public class RpcConsumerNativeTest {
     public static final String registryType = "zookeeper";
 
     private RpcClient rpcClient;
+    private static final boolean flag = true;
 
     @Before
     public void init() {
@@ -51,6 +52,9 @@ public class RpcConsumerNativeTest {
 
         log.info("rpc call result={}", res);
         // rpcClient.shutdown();
+        while (flag) {
+            this.wait(3000);
+        }
     }
 
 

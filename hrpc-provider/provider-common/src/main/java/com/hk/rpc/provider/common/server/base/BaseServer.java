@@ -207,6 +207,7 @@ public class BaseServer implements Server {
         this.executorService.scheduleAtFixedRate(ProviderConnectionManager::scanInactiveChannel,
                 10, this.scanInactiveInterval,  TimeUnit.MILLISECONDS);
 
+        // TODO 有待改善优化服务提供者连续三次没有收到服务消费者的响应后断开连接的实现逻辑
         this.executorService.scheduleAtFixedRate(ProviderConnectionManager::disconnectProvider,
                 3, 5, TimeUnit.SECONDS);
     }

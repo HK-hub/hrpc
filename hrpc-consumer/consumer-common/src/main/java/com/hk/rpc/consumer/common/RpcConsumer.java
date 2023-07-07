@@ -69,6 +69,19 @@ public class RpcConsumer implements Consumer {
      */
     private int scanInactiveInterval = 60000;
 
+
+    /**
+     * 重试时间间隔
+     */
+    private int retryInterval = 500;
+
+    /**
+     * 重试次数
+     */
+    private int retryTimes = 3;
+
+
+
     public static Map<String, RpcConsumerHandler> handlerMap = new ConcurrentHashMap<>();
 
 
@@ -78,7 +91,7 @@ public class RpcConsumer implements Consumer {
      * @param heartbeatInterval
      * @param scanInactiveInterval
      */
-    private RpcConsumer(int heartbeatInterval, int scanInactiveInterval) {
+    private RpcConsumer(int heartbeatInterval, int scanInactiveInterval, int retryInterval, int retryTimes) {
 
         this.localIp = IpUtils.getLocalHostIp();
         this.bootstrap = new Bootstrap();
@@ -94,6 +107,14 @@ public class RpcConsumer implements Consumer {
             this.scanInactiveInterval = scanInactiveInterval;
         }
 
+        if (retryInterval > 0) {
+            this.retryInterval = retryInterval;
+        }
+
+        if (retryTimes > 0) {
+            this.retryTimes = retryTimes;
+        }
+
         this.startHeartbeat();
     }
 
@@ -103,12 +124,12 @@ public class RpcConsumer implements Consumer {
      * 双检查单例
      * @return RpcConsumer
      */
-    public static RpcConsumer getInstance(int heartbeatInterval, int scanInactiveInterval) {
+    public static RpcConsumer getInstance(int heartbeatInterval, int scanInactiveInterval, int retryInterval, int retryTimes) {
 
         if (instance == null) {
             synchronized (RpcConsumer.class) {
                 if (instance == null) {
-                    instance = new RpcConsumer(heartbeatInterval, scanInactiveInterval);
+                    instance = new RpcConsumer(heartbeatInterval, scanInactiveInterval, retryInterval, retryTimes);
                 }
             }
         }
@@ -147,7 +168,7 @@ public class RpcConsumer implements Consumer {
         }
 
         // 服务发现: 负载均衡的进行服务发现
-        ServiceMeta serviceMeta = registryService.discovery(serviceKey, invokerHashCode, this.localIp);
+        ServiceMeta serviceMeta = this.discoveryService(registryService, serviceKey, invokerHashCode, this.localIp);
         if (Objects.nonNull(serviceMeta)) {
             RpcConsumerHandler handler = RpcConsumerHandlerHelper.get(serviceMeta);
             // 缓存中无 handler
@@ -170,6 +191,36 @@ public class RpcConsumer implements Consumer {
         }
 
         return null;
+    }
+
+
+    /**
+     * 获取服务发现获取服务提供者元数据，附带重试机制
+     * @param registryService
+     * @param serviceKey
+     * @param invokerHashCode
+     * @param localIp
+     * @return
+     */
+    private ServiceMeta discoveryService(RegistryService registryService, String serviceKey, int invokerHashCode, String localIp) throws Exception {
+
+        ServiceMeta serviceMeta = registryService.discovery(serviceKey, invokerHashCode, this.localIp);
+
+        if (Objects.isNull(serviceMeta)) {
+            // 获取到的服务元数据为空，进行重试
+            for (int i = 1; i <= retryTimes; i++) {
+                log.debug("get rpc provider service meta data retry times:{}", i);
+                serviceMeta = registryService.discovery(serviceKey, invokerHashCode, localIp);
+                if (Objects.nonNull(serviceMeta)) {
+                    break;
+                }
+
+                // 重试间隔时间
+                Thread.sleep(this.retryInterval);
+            }
+        }
+
+        return serviceMeta;
     }
 
 
