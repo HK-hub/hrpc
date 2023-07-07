@@ -22,6 +22,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
+
+import java.net.ConnectException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -80,6 +82,11 @@ public class RpcConsumer implements Consumer {
      */
     private int retryTimes = 3;
 
+
+    /**
+     * 当前重试链接服务提供者次数
+     */
+    private int currentConnectRetryTimes = 0;
 
 
     public static Map<String, RpcConsumerHandler> handlerMap = new ConcurrentHashMap<>();
@@ -169,28 +176,20 @@ public class RpcConsumer implements Consumer {
 
         // 服务发现: 负载均衡的进行服务发现
         ServiceMeta serviceMeta = this.discoveryService(registryService, serviceKey, invokerHashCode, this.localIp);
+        RpcConsumerHandler handler = null;
         if (Objects.nonNull(serviceMeta)) {
-            RpcConsumerHandler handler = RpcConsumerHandlerHelper.get(serviceMeta);
-            // 缓存中无 handler
-            if (Objects.isNull(handler)) {
-                handler = getRpcConsumerHandler(serviceMeta);
-                RpcConsumerHandlerHelper.put(serviceMeta, handler);
-            } else if (BooleanUtils.isFalse(handler.getChannel().isActive())) {
-                // 存在handler 但是不活跃
-                handler.close();
-                handler = getRpcConsumerHandler(serviceMeta);
-                RpcConsumerHandlerHelper.put(serviceMeta, handler);
-            }
-
-            // 发送请求
-            RPCFuture future = handler.sendRequest(protocol, request.isAsync(), request.isOneway());
-
-            // 断开链接，关闭连接数负载
-            ConnectionsContext.remove(serviceMeta);
-            return future;
+            handler = this.getRpcConsumerHandlerWithRetry(serviceMeta);
         }
 
-        return null;
+        RPCFuture future = null;
+        if (Objects.nonNull(handler)) {
+            // 发送请求
+            future = handler.sendRequest(protocol, request.isAsync(), request.isOneway());
+            // 断开链接，关闭连接数负载
+            ConnectionsContext.remove(serviceMeta);
+        }
+
+        return future;
     }
 
 
@@ -230,7 +229,7 @@ public class RpcConsumer implements Consumer {
      * @return
      * @throws InterruptedException
      */
-    private RpcConsumerHandler getRpcConsumerHandler(ServiceMeta serviceMeta) throws InterruptedException {
+    private RpcConsumerHandler getRpcConsumerHandler(ServiceMeta serviceMeta) throws Exception {
 
         String serviceAddress = serviceMeta.getServiceAddress();
         int port = serviceMeta.getPort();
@@ -241,6 +240,8 @@ public class RpcConsumer implements Consumer {
                 log.info("connect rpc server {} on port {} success.", serviceAddress, port);
                 // 添加服务实例连接数量: 添加连接信息，在服务消费者端记录每个服务提供者实例的连接次数
                 ConnectionsContext.add(serviceMeta);
+                // 链接成功重置连接次数
+                this.currentConnectRetryTimes = 0;
             } else {
                 log.error("connect rpc server {} on port {} failed.", serviceAddress, port);
                 channelFuture.cause().printStackTrace();
@@ -250,6 +251,58 @@ public class RpcConsumer implements Consumer {
 
         return channelFuture.channel().pipeline().get(RpcConsumerHandler.class);
     }
+
+
+    /**
+     * 重试机制获取连接
+     * @param serviceMeta
+     * @return
+     * @throws Exception
+     */
+    private RpcConsumerHandler getRpcConsumerHandlerWithRetry(ServiceMeta serviceMeta) throws Exception {
+
+        RpcConsumerHandler handler = null;
+
+        try {
+            handler = this.getRpcConsumerHandlerWithCache(serviceMeta);
+        } catch (Exception e) {
+            if (e instanceof ConnectException) {
+                // 链接异常，启用重试机制
+                if (handler == null) {
+                    for ( ; this.currentConnectRetryTimes < this.retryTimes; this.currentConnectRetryTimes++) {
+                        log.debug("rpc consumer retry connect provider:{}:{}, retry times={}", serviceMeta.getServiceAddress(), serviceMeta.getPort(), this.currentConnectRetryTimes);
+                        handler = this.getRpcConsumerHandlerWithCache(serviceMeta);
+                        if (Objects.nonNull(handler)) {
+                            break;
+                        }
+                        Thread.sleep(this.retryInterval);
+                    }
+                }
+            }
+        }
+
+        return handler;
+    }
+
+
+    /**
+     * 从缓存中获取RpcConsumerHandler，缓存中没有，再创建
+     */
+    private RpcConsumerHandler getRpcConsumerHandlerWithCache(ServiceMeta serviceMeta) throws Exception {
+        RpcConsumerHandler handler = RpcConsumerHandlerHelper.get(serviceMeta);
+        // 缓存中无 handler
+        if (Objects.isNull(handler)) {
+            handler = getRpcConsumerHandler(serviceMeta);
+            RpcConsumerHandlerHelper.put(serviceMeta, handler);
+        } else if (BooleanUtils.isFalse(handler.getChannel().isActive())) {
+            // 存在handler 但是不活跃
+            handler.close();
+            handler = getRpcConsumerHandler(serviceMeta);
+            RpcConsumerHandlerHelper.put(serviceMeta, handler);
+        }
+        return handler;
+    }
+
 
 
     /**
