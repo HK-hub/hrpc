@@ -15,6 +15,7 @@
     <modules>
         <module>provider-common</module>
         <module>provider-native</module>
+        <module>provider-spring</module>
     </modules>
 
     <properties>

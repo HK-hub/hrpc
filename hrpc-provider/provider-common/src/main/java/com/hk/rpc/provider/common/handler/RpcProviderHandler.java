@@ -15,14 +15,12 @@ import com.hk.rpc.provider.common.manager.ProviderConnectionManager;
 import com.hk.rpc.reflect.api.ReflectInvoker;
 import com.hk.rpc.spi.loader.ExtensionLoader;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.cglib.reflect.FastClass;
-import net.sf.cglib.reflect.FastMethod;
-
-import java.lang.reflect.Method;
-import java.sql.Blob;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
@@ -110,8 +108,8 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
 
         // 解析消息类型
         RpcHeader header = protocol.getHeader();
-
         int msgType = header.getMsgType();
+
         if (Objects.equals(msgType, RpcType.HEARTBEAT_FROM_CONSUMER.getType())) {
             // 心跳消息：ping
             response = this.handleHeartbeatMessage(protocol, header);
@@ -122,7 +120,6 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
             // 请求消息
             response = this.handleRequestMessage(protocol, header);
         }
-
         log.debug("rpc provider handle request={}, and response={}", protocol, response);
         return response;
     }
@@ -147,6 +144,7 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
         try {
             // 处理请求
             Object result = handle(request);
+
             response.setResult(result);
             response.setAsync(request.isAsync())
                     .setOneway(request.isOneway());
@@ -244,7 +242,8 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
         log.debug("rpc service class={}, method={}, parameterTypes={}, parameters={}", serviceClass.getName(), methodName,
                 Arrays.toString(parameterTypes), Arrays.toString(parameters));
 
-        // 调用目标方法
+        // 调用目标方法: 带上重试机制
+
         return invokeMethod(serviceBean, serviceClass, methodName, parameterTypes, parameters);
     }
 
@@ -310,4 +309,7 @@ public class RpcProviderHandler extends SimpleChannelInboundHandler<RpcProtocol<
 
         super.userEventTriggered(ctx, evt);
     }
+
+
+
 }
