@@ -23,6 +23,7 @@
         <module>hrpc-loadbalance</module>
         <module>hrpc-spi</module>
         <module>hrpc-reflect</module>
+        <module>hrpc-demo</module>
     </modules>
 
     <properties>
