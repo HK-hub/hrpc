@@ -1,5 +1,6 @@
 package com.hk.rpc.provider.common.server.base;
 
+import com.hk.rpc.annotation.RpcService;
 import com.hk.rpc.codec.RpcDecoder;
 import com.hk.rpc.codec.RpcEncoder;
 import com.hk.rpc.constants.RpcConstants;

@@ -3,30 +3,30 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>hrpc</artifactId>
+        <artifactId>hrpc-demo</artifactId>
         <groupId>com.hk.rpc</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-
     <modelVersion>4.0.0</modelVersion>
 
-    <packaging>pom</packaging>
-    <artifactId>hrpc-demo</artifactId>
-
-    <modules>
-        <module>demo-api</module>
-        <module>demo-native-provider</module>
-        <module>demo-native-consumer</module>
-        <module>demo-spring-xml-provider</module>
-        <module>demo-spring-annotation-provider</module>
-    </modules>
-
+    <artifactId>demo-spring-annotation-provider</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
 
-
+    <dependencies>
+        <dependency>
+            <groupId>com.hk.rpc</groupId>
+            <artifactId>demo-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hk.rpc</groupId>
+            <artifactId>provider-spring</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 
 </project>
