@@ -78,4 +78,30 @@ public @interface RpcReference {
      */
     String proxy() default "jdk";
 
+    /**
+     * 心跳检测时间：默认30 秒
+     * @return
+     */
+    int heartbeatInterval() default 30000;
+
+
+    /**
+     * 扫描空闲连接时间间隔: 默认 60秒
+     * @return
+     */
+    int scanInactiveChannelInterval() default 60000;
+
+
+    /**
+     * 重试机制重试次数
+     * @return
+     */
+    int retryTimes() default 3;
+
+    /**
+     * 重试时间间隔: 默认 1秒
+     * @return
+     */
+    int retryInterval() default 1000;
+
 }
