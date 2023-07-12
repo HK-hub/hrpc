@@ -8,7 +8,6 @@ import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
@@ -18,7 +17,6 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;

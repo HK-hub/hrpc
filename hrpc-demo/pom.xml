@@ -20,6 +20,7 @@
         <module>demo-spring-xml-provider</module>
         <module>demo-spring-annotation-provider</module>
         <module>demo-spring-consumer</module>
+        <module>demo-spring-xml-consumer</module>
     </modules>
 
 
