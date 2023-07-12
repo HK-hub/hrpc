@@ -128,7 +128,11 @@ public class RpcReferenceBean<T> implements FactoryBean<T> {
     }
 
 
-
+    /**
+     * 通过 getObject() 获取到被代理对象，通过代理对象来进行RPC 调用
+     * @return
+     * @throws Exception
+     */
     @Override
     public T getObject() throws Exception {
 
