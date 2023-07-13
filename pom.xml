@@ -24,6 +24,7 @@
         <module>hrpc-spi</module>
         <module>hrpc-reflect</module>
         <module>hrpc-demo</module>
+        <module>hrpc-spring-boot-starter</module>
     </modules>
 
     <properties>
