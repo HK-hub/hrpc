@@ -25,6 +25,7 @@
         <module>hrpc-reflect</module>
         <module>hrpc-demo</module>
         <module>hrpc-spring-boot-starter</module>
+        <module>hrpc-cache</module>
     </modules>
 
     <properties>
