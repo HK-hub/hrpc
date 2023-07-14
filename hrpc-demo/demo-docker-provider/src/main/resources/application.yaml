@@ -1,0 +1,19 @@
+server:
+  port: 8080
+
+hrpc:
+  provider:
+    # rpc server
+    serverAddress: 0.0.0.0:20881
+    # serverRegistryAddress
+    serverRegistryAddress: 192.168.184.102:20881
+    # zookeeper server
+    registryAddress: 192.168.184.102:2181
+    # registry center type, zookeeper/nacos/apoll/etcd/eureka
+    registryType: zookeeper
+    #registry loadbalance type: zkconsistenthash
+    registryLoadBalanceType: zkconsistenthash
+    # reflect type, value is jdk or cglib
+    reflectType: cglib
+    # heartbeatInterval
+    heartbeatInterval: 30000

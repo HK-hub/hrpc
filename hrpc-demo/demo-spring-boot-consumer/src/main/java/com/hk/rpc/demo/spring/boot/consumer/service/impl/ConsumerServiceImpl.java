@@ -1,7 +1,6 @@
 package com.hk.rpc.demo.spring.boot.consumer.service.impl;
 
 import com.hk.rpc.annotation.RpcReference;
-import com.hk.rpc.annotation.RpcService;
 import com.hk.rpc.demo.api.DemoService;
 import com.hk.rpc.demo.spring.boot.consumer.service.ConsumerService;
 import lombok.extern.slf4j.Slf4j;
