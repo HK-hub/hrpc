@@ -1,0 +1,30 @@
+hrpc:
+  consumer:
+    # zookeeper server
+    registryAddress: 127.0.0.1:2181
+    # registry center type, zookeeper/nacos/apoll/etcd/eureka
+    registryType: zookeeper
+    # registry loadbalance type: zkconsistenthash
+    loadBalanceType: zkconsistenthash
+    # proxy type/javassist/jdk
+    proxy: cglib
+    # version
+    version: 1.0.0
+    # group
+    group: hello
+    # zkconsistenthash
+    serializationType: zkconsistenthash
+    # timeout
+    timeout: 30000
+    # async
+    async: false
+    # oneway
+    oneway: false
+    # heartbeatInterval
+    heartbeatInterval: 30000
+    # scanNotActiveChannelInterval
+    scanNotActiveChannelInterval: 60000
+    # retryInterval
+    retryInterval: 1000
+    # retryTimes
+    retryTimes: 3

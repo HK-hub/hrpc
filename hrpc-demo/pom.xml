@@ -23,6 +23,7 @@
         <module>demo-spring-xml-consumer</module>
         <module>demo-spring-annotation-consumer</module>
         <module>demo-spring-boot-provider</module>
+        <module>demo-spring-boot-consumer</module>
     </modules>
 
 
