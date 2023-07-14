@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>spring-boot-starter-provider</artifactId>
+    <artifactId>hrpc-spring-boot-starter-consumer</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -19,10 +19,9 @@
     <dependencies>
         <dependency>
             <groupId>com.hk.rpc</groupId>
-            <artifactId>provider-spring</artifactId>
+            <artifactId>consumer-native</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
-
 
 </project>

@@ -12,7 +12,8 @@
     <artifactId>hrpc-spring-boot-starter</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>spring-boot-starter-provider</module>
+        <module>hrpc-spring-boot-starter-provider</module>
+        <module>hrpc-spring-boot-starter-consumer</module>
     </modules>
 
     <properties>
