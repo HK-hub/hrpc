@@ -1,0 +1,14 @@
+# web 容器应用
+server:
+  port: 8080
+
+hrpc:
+  provider:
+  # rpc server
+  serverAddress: localhost:20880
+  registryAddress: localhost:2181
+  registryType: zookeeper
+  loadBalanceType: random
+  reflectType: cglib
+  heartbeatInterval: 30000
+  scanInactiveChannelInterval: 60000
