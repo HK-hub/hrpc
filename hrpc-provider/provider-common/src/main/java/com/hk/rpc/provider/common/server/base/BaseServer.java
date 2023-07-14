@@ -120,6 +120,32 @@ public class BaseServer implements Server {
         this.registryService = this.createRegistryService(registryAddress, registryType, registryLoadBalanceType);
     }
 
+    public BaseServer(String address, String reflectType, String registryAddress, String registryLoadBalanceType,
+                      String registryType, int heartbeatInterval, int scanInactiveInterval) {
+
+        String[] hostAndPort = address.split(":");
+        if (StringUtils.isNotEmpty(hostAndPort[0])) {
+            this.address = hostAndPort[0];
+        }
+
+        this.port = Integer.parseInt(hostAndPort[1]);
+
+        this.reflectType = reflectType;
+
+        // 心跳配置时间
+        if (heartbeatInterval > 0) {
+            this.heartbeatInterval = heartbeatInterval;
+        }
+
+        if (scanInactiveInterval > 0) {
+            this.scanInactiveInterval = scanInactiveInterval;
+        }
+
+        // registry service
+        this.registryService = this.createRegistryService(registryAddress, registryType, registryLoadBalanceType);
+    }
+
+
     /**
      * 创建服务注册与发现的实现类
      * @param registryAddress

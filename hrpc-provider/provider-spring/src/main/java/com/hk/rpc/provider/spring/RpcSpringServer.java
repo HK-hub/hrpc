@@ -34,7 +34,7 @@ public class RpcSpringServer extends BaseServer implements ApplicationContextAwa
     /**
      * 指定地址，端口
      *
-     * @param address
+     * @param host
      * @param port
      * @param reflectType
      * @param registryAddress
@@ -43,8 +43,13 @@ public class RpcSpringServer extends BaseServer implements ApplicationContextAwa
      * @param heartbeatInterval
      * @param scanInactiveInterval
      */
-    public RpcSpringServer(String address, int port, String reflectType, String registryAddress, String registryLoadBalanceType, String registryType, int heartbeatInterval, int scanInactiveInterval) {
-        super(address, port, reflectType, registryAddress, registryLoadBalanceType, registryType, heartbeatInterval, scanInactiveInterval);
+    public RpcSpringServer(String host, int port, String reflectType, String registryAddress, String registryLoadBalanceType, String registryType, int heartbeatInterval, int scanInactiveInterval) {
+        super(host, port, reflectType, registryAddress, registryLoadBalanceType, registryType, heartbeatInterval, scanInactiveInterval);
+    }
+
+
+    public RpcSpringServer(String hostAndPort, String reflectType, String registryAddress, String registryLoadBalanceType, String registryType, int heartbeatInterval, int scanInactiveInterval) {
+        super(hostAndPort, reflectType, registryAddress, registryLoadBalanceType, registryType, heartbeatInterval, scanInactiveInterval);
     }
 
 
